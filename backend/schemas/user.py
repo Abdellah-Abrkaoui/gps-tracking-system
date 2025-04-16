@@ -10,8 +10,8 @@ class UserCreate(SQLModel):
 class UserRead(SQLModel):
     id: int
     username: str
-    is_admin: Optional[bool] = False
-    devices: Optional[list[int]] = None
+    is_admin: bool
+    devices: list[int]
 
 class UserModify(SQLModel):
     username: str
