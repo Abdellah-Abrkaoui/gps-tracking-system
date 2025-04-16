@@ -1,19 +1,22 @@
+from typing import Optional, List
 from sqlmodel import SQLModel
-from typing import Optional
 
-class UserCreate(SQLModel):
+class User(SQLModel):
     username: str
-    password: str
     is_admin: Optional[bool] = False
-    devices: Optional[list[int]] = None
+    devices: Optional[List[int]] = None
 
-class UserRead(SQLModel):
+class UserCreate(User):
+    password: str
+
+class UserRead(User):
     id: int
-    username: str
-    is_admin: bool
-    devices: list[int]
+
+    class Config:
+        from_attributes = True
 
 class UserModify(SQLModel):
-    username: str
-    is_admin: Optional[bool] = False
-    devices: Optional[list[int]] = None
+    username: Optional[str]
+    is_admin: Optional[bool]
+    devices: Optional[List[int]]
+
