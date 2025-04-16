@@ -1,5 +1,5 @@
-
 from sqlmodel import Session
+from db.database import engine
 from db.models import User
 from core.utils import get_password_hash
 
