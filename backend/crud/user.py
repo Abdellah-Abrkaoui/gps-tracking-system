@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException, status
 from db.models import User
-from schemas.user import UserCreate
+from schemas.user import UserCreate, UserModify
 
 def get_user_by_id(session: Session, user_id: int) -> User:
     user = session.get(User, user_id)
@@ -25,6 +25,20 @@ def create_user(session: Session, user: UserCreate) -> User:
 
     return db_user 
 
+def update_user(session: Session, user_id: int, user_update: UserModify) -> User:
+    user = get_user_by_id(session, user_id)
+
+    if user_update.username:
+        user.username = user_update.username
+
+    # TODO: hash the password
+    if user_update.password:
+        user.password = user_update.password
+
+    session.commit()
+    session.refresh(user)
+    
+    return user
 
 def delete_user(session: Session, user_id: int) -> dict:
     user = get_user_by_id(session, user_id)
