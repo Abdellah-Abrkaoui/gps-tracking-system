@@ -16,7 +16,8 @@ class UserRead(User):
         from_attributes = True
 
 class UserModify(SQLModel):
-    username: Optional[str]
-    is_admin: Optional[bool]
-    devices: Optional[List[int]]
+    username: Optional[str] = None
+    password: Optional[str] = None
+    is_admin: Optional[bool] = None
+    devices: Optional[List[int]] = None
 
