@@ -12,7 +12,7 @@ services:
       - ./backend:/app
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/postgres
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: bash -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     networks:
       - backend-network
 
