@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 from fastapi import HTTPException, status
 from db.models import User
 from schemas.user import UserCreate, UserModify
+from core.utils import get_password_hash
 
 def get_user_by_id(session: Session, user_id: int) -> User:
     user = session.get(User, user_id)
@@ -18,7 +19,8 @@ def create_user(session: Session, user: UserCreate) -> User:
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists")
 
-    db_user = User(**user.dict())
+    hashed_password = get_password_hash(user.password)
+    db_user = User(**user.dict(), password=hashed_password)  
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -31,9 +33,8 @@ def update_user(session: Session, user_id: int, user_update: UserModify) -> User
     if user_update.username:
         user.username = user_update.username
 
-    # TODO: hash the password
     if user_update.password:
-        user.password = user_update.password
+        user.password = get_password_hash(user_update.password)
 
     session.commit()
     session.refresh(user)
