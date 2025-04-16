@@ -18,7 +18,7 @@ def read_users(session: Session = Depends(get_session)):
 def add_user(user: UserCreate, session: Session = Depends(get_session)):
     return create_user(session, user)
 
-@router.patch("/users/{user_id}", response_model=UserModify)
+@router.patch("/users/{user_id}", response_model=UserRead)
 def modify_user(user_id: int, user_update: UserModify, session: Session = Depends(get_session)):
     return update_user(session=session, user_id=user_id, user_update=user_update)
 
