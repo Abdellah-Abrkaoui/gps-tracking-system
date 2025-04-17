@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from db.database import engine, SQLModel
+from db.database import engine
+from sqlmodel import SQLModel
 from api.v1 import router
 from seed import seed_users
 
