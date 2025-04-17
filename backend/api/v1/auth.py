@@ -21,6 +21,6 @@ def login_for_access_token(
         )
 
     access_token = create_access_token(
-        {"sub": user.username, "is_admin": user.is_admin}
+        {"sub": user.username, "id": user.id, "is_admin": user.is_admin}
     )
     return Token(access_token=access_token, token_type="bearer")
