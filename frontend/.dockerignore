@@ -1,5 +1,4 @@
 node_modules/
-
 build/
 dist/
 
@@ -11,7 +10,4 @@ yarn-error.log
 Dockerfile
 
 package-lock.json
-
-*.md
-README.md
 
