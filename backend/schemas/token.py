@@ -8,5 +8,5 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str
-    is_admin: bool = False
-    user_id: int
+    is_admin: bool
+    id: int
