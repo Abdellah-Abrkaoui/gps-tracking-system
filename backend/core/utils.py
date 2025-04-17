@@ -7,6 +7,7 @@ from db.models import User
 from db.database import get_session, Session
 from schemas.token import TokenData
 from typing import Annotated
+from crud.user import get_user_by_id, get_user_by_username
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -15,14 +16,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "3d4c35d5e90faede75526fc84eeb967b4b5b3b78c34e65780c36f6db9e9c9287"  # TODO change in production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
-def get_user_by_id(session: Session, user_id: int) -> User | None:
-    return session.get(User, user_id)
-
-
-def get_user_by_username(session: Session, username: str) -> User | None:
-    return session.query(User).filter(User.username == username).first()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -82,8 +75,7 @@ def get_current_user(
         )
     return TokenData(
         username=user.username,
-        role=user.is_admin,
-        user_id=user.id,
+        id=user.id,
         is_admin=user.is_admin,
     )
 
@@ -100,16 +92,9 @@ def authenticate_user(
 
 
 def verify_access(
-    user_id: int = Path(),
+    user_id: int = Path(...),
     token: str = Depends(oauth2_scheme),
-    session: Session = Depends(get_session),
-) -> bool:
-    current_user = get_current_user(token, session)
-
-    if user_id:
-        if current_user.is_admin is False and current_user.user_id != user_id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
-            )
-
-    return True
+) -> None:
+    token = decode_jwt_token(token)
+    if user_id != token["id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")

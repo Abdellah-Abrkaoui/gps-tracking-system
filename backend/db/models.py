@@ -1,10 +1,6 @@
-from sqlmodel import SQLModel, Field, JSON, Column
-from typing import Optional
+from sqlmodel import SQLModel, Field, JSON, Column, Relationship
+from typing import Optional, List
 from datetime import datetime
-
-#
-# TODO: add relationships
-#
 
 
 class User(SQLModel, table=True):
@@ -16,6 +12,10 @@ class User(SQLModel, table=True):
     is_admin: Optional[bool] = False
     devices: list[int] | None = Field(default=None, sa_column=Column(JSON))
 
+    user_device_links: List["UserDeviceLink"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete"}
+    )
+
 
 class Device(SQLModel, table=True):
     __tablename__ = "devices"
@@ -24,36 +24,52 @@ class Device(SQLModel, table=True):
     hardware_id: int
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+    user_device_links: List["UserDeviceLink"] = Relationship(
+        back_populates="device", sa_relationship_kwargs={"cascade": "all, delete"}
+    )
+    locations: List["Location"] = Relationship(
+        back_populates="device", sa_relationship_kwargs={"cascade": "all, delete"}
+    )
+    license_plate_history: List["LicensePlateHistory"] = Relationship(
+        back_populates="device", sa_relationship_kwargs={"cascade": "all, delete"}
+    )
+
 
 class UserDeviceLink(SQLModel, table=True):
     __tablename__ = "user_device_link"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
-    device_id: int = Field(foreign_key="devices.id")
+    user_id: int = Field(foreign_key="users.id", nullable=False)
+    device_id: int = Field(foreign_key="devices.id", nullable=False)
+
+    user: Optional[User] = Relationship(back_populates="user_device_links")
+    device: Optional[Device] = Relationship(back_populates="user_device_links")
 
 
 class Location(SQLModel, table=True):
     __tablename__ = "locations"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    device_id: int = Field(foreign_key="devices.id")
+    device_id: int = Field(foreign_key="devices.id", nullable=False)
     latitude: float
     longtitude: float
     altitude: float
     speed: float
     timestamp: Optional[datetime] = None
     date: Optional[datetime] = None
-
     received_at: datetime = Field(default_factory=datetime.utcnow)
+
+    device: Optional[Device] = Relationship(back_populates="locations")
 
 
 class LicensePlateHistory(SQLModel, table=True):
     __tablename__ = "license_plate_history"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    device_id: int = Field(foreign_key="devices.id")
+    device_id: int = Field(foreign_key="devices.id", nullable=False)
     license_plate: str
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    device: Optional[Device] = Relationship(back_populates="license_plate_history")
