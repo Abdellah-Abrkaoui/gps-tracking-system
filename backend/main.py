@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from db.database import engine
-from db.models import SQLModel
+from db.database import engine, SQLModel
 from api.v1 import router
 from seed import seed_users
 
@@ -12,4 +11,3 @@ def on_startup():
     seed_users(engine)
 
 app.include_router(router)
-
