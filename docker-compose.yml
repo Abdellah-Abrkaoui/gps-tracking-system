@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   backend:
     build: ./backend
@@ -12,7 +10,21 @@ services:
       - ./backend:/app
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/postgres
-    command: bash -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    networks:
+      - backend-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: react-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://backend:8000
     networks:
       - backend-network
 
