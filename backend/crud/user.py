@@ -3,16 +3,24 @@ from db.models import User
 from schemas.user import UserCreate, UserModify, UserRead
 from core.utils import get_password_hash
 
+
 def get_user_by_id(session: Session, user_id: int) -> User | None:
     return session.get(User, user_id)
+
 
 def get_users(session: Session) -> list[User]:
     return session.query(User).all()
 
+
 def create_user(session: Session, user: UserCreate) -> UserRead | None:
     hashed_password = get_password_hash(user.password)
 
-    db_user = User(username=user.username, password=hashed_password, is_admin=user.is_admin, devices=user.devices)
+    db_user = User(
+        username=user.username,
+        password=hashed_password,
+        is_admin=user.is_admin,
+        devices=user.devices,
+    )
 
     session.add(db_user)
     session.commit()
@@ -30,11 +38,12 @@ def update_user(session: Session, user: User, user_update_data: UserModify) -> U
     session.add(user)
     session.commit()
     session.refresh(user)
-    
+
     return user
+
 
 def delete_user(session: Session, user: User) -> dict:
     session.delete(user)
     session.commit()
-    
+
     return {"detail": "User deleted successfully"}

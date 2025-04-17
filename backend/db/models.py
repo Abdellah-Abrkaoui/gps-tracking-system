@@ -6,8 +6,9 @@ from datetime import datetime
 # TODO: add relationships
 #
 
+
 class User(SQLModel, table=True):
-    __tablename__  = "users"
+    __tablename__ = "users"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)
@@ -15,22 +16,25 @@ class User(SQLModel, table=True):
     is_admin: Optional[bool] = False
     devices: list[int] | None = Field(default=None, sa_column=Column(JSON))
 
+
 class Device(SQLModel, table=True):
-    __tablename__  = "devices"
+    __tablename__ = "devices"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     hardware_id: int
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
 class UserDeviceLink(SQLModel, table=True):
-    __tablename__  = "user_device_link"
+    __tablename__ = "user_device_link"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
     device_id: int = Field(foreign_key="devices.id")
 
+
 class Location(SQLModel, table=True):
-    __tablename__  = "locations"
+    __tablename__ = "locations"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     device_id: int = Field(foreign_key="devices.id")
@@ -45,7 +49,7 @@ class Location(SQLModel, table=True):
 
 
 class LicensePlateHistory(SQLModel, table=True):
-    __tablename__  = "license_plate_history"
+    __tablename__ = "license_plate_history"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     device_id: int = Field(foreign_key="devices.id")
@@ -53,4 +57,3 @@ class LicensePlateHistory(SQLModel, table=True):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
-
