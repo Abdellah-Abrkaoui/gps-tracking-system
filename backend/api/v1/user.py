@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlmodel import Session
 from db.database import get_session
-from crud.user import get_users, create_user, get_user_by_id, delete_user, update_user, get_user_by_username
+from crud.user import get_users, create_user, get_user_by_id, delete_user, update_user
+from core.utils import get_user_by_username
 from schemas.user import UserCreate, UserRead, UserModify
 
 router = APIRouter()
