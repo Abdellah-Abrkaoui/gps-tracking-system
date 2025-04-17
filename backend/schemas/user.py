@@ -1,7 +1,7 @@
 from typing import Optional, List
-from sqlmodel import SQLModel
+from pydantic import BaseModel
 
-class User(SQLModel):
+class User(BaseModel):
     username: str
     is_admin: Optional[bool] = False
     devices: Optional[List[int]] = None
@@ -12,10 +12,7 @@ class UserCreate(User):
 class UserRead(User):
     id: int
 
-    class Config:
-        from_attributes = True
-
-class UserModify(SQLModel):
+class UserModify(User):
     username: Optional[str] = None
     password: Optional[str] = None
     is_admin: Optional[bool] = None
