@@ -3,8 +3,11 @@ from db.database import engine
 from sqlmodel import SQLModel
 from api.v1 import router
 from seed import seed_users
+from config.openapi import custom_openapi
 
 app = FastAPI()
+
+app.openapi = lambda: custom_openapi(app)
 
 
 @app.on_event("startup")
