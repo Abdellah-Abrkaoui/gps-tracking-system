@@ -1,49 +1,43 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException, status
 from db.models import User
-from schemas.user import UserCreate, UserModify
+from schemas.user import UserCreate, UserModify, UserRead
 from core.utils import get_password_hash
 
-def get_user_by_id(session: Session, user_id: int) -> User:
-    user = session.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+def get_user_by_username(session: Session, username: str) -> User | None:
+    return session.query(User).filter(User.username == username).first()
 
-    return user
+def get_user_by_id(session: Session, user_id: int) -> User | None:
+    return session.get(User, user_id)
 
 def get_users(session: Session) -> list[User]:
     return session.query(User).all()
 
-def create_user(session: Session, user: UserCreate) -> User:
-    existing_user = session.exec(select(User).where(User.username == user.username)).first()
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists")
-
+def create_user(session: Session, user: UserCreate) -> UserRead | None:
     hashed_password = get_password_hash(user.password)
-    db_user = User(**user.dict(), password=hashed_password)  
+
+    db_user = User(username=user.username, password=hashed_password, is_admin=user.is_admin, devices=user.devices)
+
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
 
-    return db_user 
+    return UserRead.from_orm(db_user)
 
-def update_user(session: Session, user_id: int, user_update: UserModify) -> User:
-    user = get_user_by_id(session, user_id)
 
-    if user_update.username:
-        user.username = user_update.username
+def update_user(session: Session, user: User, user_update_data: UserModify) -> User:
+    if user_update_data.password:
+        user_update_data.password = get_password_hash(user_update_data.password)
 
-    if user_update.password:
-        user.password = get_password_hash(user_update.password)
-
+    user_data = user_update_data.model_dump(exclude_unset=True)
+    user.sqlmodel_update(user_data)
+    session.add(user)
     session.commit()
     session.refresh(user)
     
     return user
 
-def delete_user(session: Session, user_id: int) -> dict:
-    user = get_user_by_id(session, user_id)
-
+def delete_user(session: Session, user: User) -> dict:
     session.delete(user)
     session.commit()
     
