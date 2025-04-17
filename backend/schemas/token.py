@@ -7,4 +7,6 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str | None = None
+    username: str
+    is_admin: bool = False
+    user_id: int

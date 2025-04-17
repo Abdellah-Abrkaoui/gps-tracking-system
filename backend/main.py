@@ -9,6 +9,7 @@ app = FastAPI()
 
 app.openapi = lambda: custom_openapi(app)
 
+
 @app.on_event("startup")
 def on_startup():
     SQLModel.metadata.create_all(engine)

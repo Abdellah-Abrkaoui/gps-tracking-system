@@ -4,10 +4,6 @@ from schemas.user import UserCreate, UserModify, UserRead
 from core.utils import get_password_hash
 
 
-def get_user_by_id(session: Session, user_id: int) -> User | None:
-    return session.get(User, user_id)
-
-
 def get_users(session: Session) -> list[User]:
     return session.query(User).all()
 
