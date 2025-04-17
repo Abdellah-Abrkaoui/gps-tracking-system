@@ -1,11 +1,7 @@
-from sqlmodel import Session, select
-from fastapi import HTTPException, status
+from sqlmodel import Session
 from db.models import User
 from schemas.user import UserCreate, UserModify, UserRead
 from core.utils import get_password_hash
-
-def get_user_by_username(session: Session, username: str) -> User | None:
-    return session.query(User).filter(User.username == username).first()
 
 def get_user_by_id(session: Session, user_id: int) -> User | None:
     return session.get(User, user_id)
