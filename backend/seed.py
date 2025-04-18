@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from core.utils import get_password_hash
+from core.security import get_password_hash
 from db.models import User
 
 

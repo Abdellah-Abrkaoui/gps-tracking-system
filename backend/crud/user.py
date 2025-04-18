@@ -17,7 +17,7 @@ def get_users(session: Session) -> list[User]:
 
 
 def create_user(session: Session, user: UserCreate) -> UserRead | None:
-    from core.utils import get_password_hash
+    from core.security import get_password_hash
 
     hashed_password = get_password_hash(user.password)
 
@@ -36,7 +36,7 @@ def create_user(session: Session, user: UserCreate) -> UserRead | None:
 
 
 def update_user(session: Session, user: User, user_update_data: UserModify) -> User:
-    from core.utils import get_password_hash
+    from core.security import get_password_hash
 
     if user_update_data.password:
         user_update_data.password = get_password_hash(user_update_data.password)

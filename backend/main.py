@@ -1,14 +1,13 @@
 from fastapi import FastAPI
 from sqlmodel import SQLModel
 
-from api.v1 import router
+from api.v1.routers import routers
 from config.openapi import custom_openapi
 from db.database import engine
 from seed import seed_users
 
 app = FastAPI()
-
-app.openapi = lambda: custom_openapi(app)
+origins = ["*"]
 
 
 @app.on_event("startup")
@@ -17,4 +16,15 @@ def on_startup():
     seed_users(engine)
 
 
-app.include_router(router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.openapi = lambda: custom_openapi(app)
+
+
+app.include_router(routers)
