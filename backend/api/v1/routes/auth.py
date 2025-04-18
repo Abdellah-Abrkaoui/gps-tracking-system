@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from schemas.token import Token
-from schemas.login import Login
-from db.database import get_session
-from core.utils import authenticate_user, create_access_token, Session
+from fastapi import APIRouter, Depends, HTTPException, status
 
-router = APIRouter()
+from core.security import authenticate_user, create_access_token
+from db.database import Session, get_session
+from schemas.login import Login
+from schemas.token import Token
+
+router = APIRouter(tags=["Authentication"])
 
 
 @router.post("/auth")
