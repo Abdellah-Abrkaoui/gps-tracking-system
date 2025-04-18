@@ -1,6 +1,7 @@
 from sqlmodel import Session
-from db.models import User
+
 from core.utils import get_password_hash
+from db.models import User
 
 
 def seed_users(engine) -> None:

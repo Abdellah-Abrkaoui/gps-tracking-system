@@ -1,6 +1,7 @@
-from sqlmodel import SQLModel, Field, JSON, Column, Relationship
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+
+from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
 
 class User(SQLModel, table=True):
