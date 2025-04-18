@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session
 
 from core.dependencies import admin_only, authentication_required, verify_access
 from crud.user import (
@@ -10,7 +9,7 @@ from crud.user import (
     get_users,
     update_user,
 )
-from db.database import get_session
+from db.database import Session, get_session
 from schemas.user import UserCreate, UserModify, UserRead
 
 router = APIRouter(

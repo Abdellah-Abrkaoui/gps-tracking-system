@@ -7,9 +7,8 @@ def custom_openapi(app: FastAPI):
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title="FastAPI application",
-        version="1.0.0",
-        description="JWT Authentication and Authorization",
+        title="GPS Tracking System API",
+        version="0.0.1",
         routes=app.routes,
     )
 
