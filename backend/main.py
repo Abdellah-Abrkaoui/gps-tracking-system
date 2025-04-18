@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from db.database import engine
 from sqlmodel import SQLModel
+
 from api.v1 import router
-from seed import seed_users
 from config.openapi import custom_openapi
+from db.database import engine
+from seed import seed_users
 
 app = FastAPI()
 

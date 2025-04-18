@@ -1,6 +1,8 @@
 from sqlmodel import Session
+
 from db.models import User
 from schemas.user import UserCreate, UserModify, UserRead
+
 
 def get_user_by_id(session: Session, user_id: int) -> User | None:
     return session.get(User, user_id)
@@ -9,11 +11,14 @@ def get_user_by_id(session: Session, user_id: int) -> User | None:
 def get_user_by_username(session: Session, username: str) -> User | None:
     return session.query(User).filter(User.username == username).first()
 
+
 def get_users(session: Session) -> list[User]:
     return session.query(User).all()
 
+
 def create_user(session: Session, user: UserCreate) -> UserRead | None:
     from core.utils import get_password_hash
+
     hashed_password = get_password_hash(user.password)
 
     db_user = User(
