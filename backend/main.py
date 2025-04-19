@@ -5,7 +5,7 @@ from sqlmodel import SQLModel
 from api.v1.routers import routers
 from config.openapi import custom_openapi
 from db.database import engine
-from seed import seed_users
+from seed import seed_database
 
 app = FastAPI()
 origins = ["*"]
@@ -14,7 +14,7 @@ origins = ["*"]
 @app.on_event("startup")
 def on_startup():
     SQLModel.metadata.create_all(engine)
-    seed_users(engine)
+    seed_database(engine)
 
 
 app.add_middleware(
