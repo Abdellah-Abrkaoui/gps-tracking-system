@@ -39,7 +39,9 @@ def read_device(
 ):
     device = get_device_by_id(session, device_id)
     if not device:
-        raise HTTPException(status_code=404, detail="Device not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Device not found"
+        )
 
     return device
 

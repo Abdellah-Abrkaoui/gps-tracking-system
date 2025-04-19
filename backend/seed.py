@@ -1,5 +1,5 @@
-from random import uniform, randint
 from datetime import datetime, timedelta
+from random import randint, uniform
 
 from sqlmodel import Session
 
@@ -94,8 +94,7 @@ def seed_database(engine) -> None:
             {
                 "device_id": device.id,
                 "license_plate": f"PLATE{device.id}{i}",
-                "start_date": datetime.utcnow()
-                - timedelta(days=randint(10, 100)),
+                "start_date": datetime.utcnow() - timedelta(days=randint(10, 100)),
                 "end_date": None
                 if i == 0
                 else datetime.utcnow() - timedelta(days=randint(1, 9)),
