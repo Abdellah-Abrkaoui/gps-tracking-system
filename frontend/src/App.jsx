@@ -5,6 +5,7 @@ import NotFound from "./pages/NotFound";
 import "./App.css";
 import Layout from "./components/Layout";
 import History from "./pages/History";
+import Users from "./pages/Users";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="history" element={<History />} />
+            <Route path="users" element={<Users />} />
             <Route path="login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Route>

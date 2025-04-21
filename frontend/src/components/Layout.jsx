@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import {
   Dashboard as DashboardIcon,
   History as HistoryIcon,
+  GroupAdd as UserIcon,
 } from "@mui/icons-material";
 import { Outlet, NavLink } from "react-router-dom";
 
@@ -38,6 +39,18 @@ const Layout = () => {
             }
           >
             <HistoryIcon fontSize="small" />
+          </NavLink>
+          <NavLink
+            to="/users"
+            className={({ isActive }) =>
+              `flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? "text-[#1E3A8A] bg-blue-50"
+                  : "text-gray-600 hover:text-[#1E3A8A] hover:bg-blue-50"
+              }`
+            }
+          >
+            <UserIcon fontSize="small" />
           </NavLink>
         </div>
 

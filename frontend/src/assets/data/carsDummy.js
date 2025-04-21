@@ -53,7 +53,7 @@ const vehicles = [
     status: "active",
     lat: 35.68,
     lng: -5.92,
-    speed: 60,
+    speed: 100,
   },
   {
     id: 8,
