@@ -10,8 +10,6 @@ services:
       - backend-network
     depends_on:
       - db
-    volumes:
-      - ./backend:/app 
 
   frontend:
     build:
@@ -21,20 +19,15 @@ services:
       - "3000:3000"
     environment:
       - REACT_APP_API_URL=http://backend:8000
-      - CHOKIDAR_USEPOLLING=true
     networks:
       - backend-network
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    working_dir: /app
 
   db:
     image: postgres:16
     container_name: postgres-db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
