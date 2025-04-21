@@ -16,4 +16,12 @@ export default defineConfig({
       secure: false, // TODO http set to true + configure https
     },
   },
+  resolve: {
+    alias: {
+      "leaflet/dist/leaflet.css": new URL(
+        "node_modules/leaflet/dist/leaflet.css",
+        import.meta.url
+      ).pathname,
+    },
+  },
 });
