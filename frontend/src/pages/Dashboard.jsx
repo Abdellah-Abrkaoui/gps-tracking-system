@@ -9,7 +9,7 @@ import SpeedChartCard from "../components/SpeedChartCard";
 
 const Dashboard = () => {
   const activeVehicles = vehicles.length;
-  const alertsToday = 3;
+  const alertsToday = 4;
   const averageSpeed = Math.round(
     vehicles.reduce((acc, v) => acc + v.speed, 0) / activeVehicles
   );
