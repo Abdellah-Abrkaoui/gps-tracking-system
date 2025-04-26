@@ -32,6 +32,7 @@ const Login = () => {
       console.log("Réponse du serveur:", response.data); // Voir la réponse
 
       if (response.status === 200) {
+        localStorage.setItem("jwt", response.data.access_token)
         localStorage.setItem("isLoggedIn", "true");
         toast.success("Login successful!");
         setTimeout(() => {
