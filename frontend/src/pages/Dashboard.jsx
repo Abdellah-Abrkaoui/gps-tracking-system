@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import CarMap from "../components/CarMap";
 import vehicles from "../assets/data/carsDummy";
 import ActiveVehiclesCard from "../components/ActiveVehiclesCard";
@@ -6,13 +6,25 @@ import AlertsCard from "../components/AlertsCard";
 import SpeedCard from "../components/SpeedCard";
 import AlertsContainer from "../components/AlertsContainer";
 import SpeedChartCard from "../components/SpeedChartCard";
+import { fetchAverageSpeed } from "../controllers/DashController";
+
 
 const Dashboard = () => {
   const activeVehicles = vehicles.length;
   const alertsToday = 4;
-  const averageSpeed = Math.round(
-    vehicles.reduce((acc, v) => acc + v.speed, 0) / activeVehicles
-  );
+  const [averageSpeed, setAverageSpeed] = useState(0);
+
+
+  
+  useEffect(() => {
+    const getSpeed = async () => {
+      const avgSpeed = await fetchAverageSpeed();
+      setAverageSpeed(avgSpeed);
+    }
+    getSpeed();
+  }, []);
+
+
   return (
     <div className="p-4 h-full flex justify-between gap-3">
       <div className="w-[70%] h-[85vh] bg-white rounded-lg shadow-md">
