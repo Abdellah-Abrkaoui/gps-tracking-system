@@ -5,10 +5,12 @@ import {
   Settings as SettingsIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,6 +34,11 @@ const Navbar = () => {
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const closeDropdown = () => setIsDropdownOpen(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    navigate("/login");
+  };
 
   return (
     <nav className="flex items-center justify-between px-6 py-3 text-black border-b-1 border-blue-200 relative">
@@ -75,13 +82,13 @@ const Navbar = () => {
                 <SettingsIcon className="mr-2" fontSize="small" />
                 Settings
               </a>
-              <a
-                href="/"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
               >
                 <LogoutIcon className="mr-2" fontSize="small" />
                 Logout
-              </a>
+              </button>
             </div>
           )}
         </div>

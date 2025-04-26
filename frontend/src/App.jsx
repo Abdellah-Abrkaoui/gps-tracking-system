@@ -6,18 +6,26 @@ import "./App.css";
 import Layout from "./components/Layout";
 import History from "./pages/History";
 import Users from "./pages/Users";
+import RequireAuth from "./components/RequireAuth";
 
 function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow">
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <Layout />
+              </RequireAuth>
+            }
+          >
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="history" element={<History />} />
             <Route path="users" element={<Users />} />
-            <Route path="login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
