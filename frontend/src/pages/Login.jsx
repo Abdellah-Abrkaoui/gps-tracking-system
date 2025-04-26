@@ -24,7 +24,7 @@ const Login = () => {
     setTimeout(() => {
       if (username === "admin" && password === "admin123") {
         localStorage.setItem("isLoggedIn", "true");
-        toast.success("Login successful! 🚀");
+        toast.success("Login successful!");
         setTimeout(() => {
           navigate("/");
         }, 1000); // wait for toast to show
@@ -36,14 +36,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-400">
       <ToastContainer />
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-4">
           <CarIcon className="text-blue-600" style={{ fontSize: "48px" }} />
         </div>
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-600">
-          Sign In
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
+          GPS CAR TRACKING SYSTEM
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col">
