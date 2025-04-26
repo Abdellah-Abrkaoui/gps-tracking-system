@@ -3,6 +3,8 @@ import { DirectionsCar as CarIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axiosInstance from "../controllers/authController"; 
+
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -11,7 +13,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!username || !password) {
@@ -21,18 +23,31 @@ const Login = () => {
 
     setLoading(true);
 
-    setTimeout(() => {
-      if (username === "admin" && password === "admin123") {
+    
+    try {
+      const response = await axiosInstance.post("/auth", {
+        username,
+        password,
+      });
+      console.log("Réponse du serveur:", response.data); // Voir la réponse
+
+      if (response.status === 200) {
         localStorage.setItem("isLoggedIn", "true");
         toast.success("Login successful!");
         setTimeout(() => {
           navigate("/");
-        }, 1000); // wait for toast to show
+        }, 1000);
       } else {
-        toast.error("Invalid username or password!");
+        toast.error("Login failed!");
       }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error.response?.data?.message || "Invalid username or password!"
+      );
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
