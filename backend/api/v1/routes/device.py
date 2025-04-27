@@ -46,7 +46,7 @@ def read_device(
     return device
 
 
-@router.get("/", response_model=List[DeviceRead])
+@router.get("", response_model=List[DeviceRead])
 def read_devices(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
 ):
