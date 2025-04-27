@@ -1,111 +1,117 @@
-import { useState, useEffect } from "react";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { Card, CardContent } from "../components/Card";
 
-const CAR_LIST = [
-  { id: "Vehicle #1", label: "Vehicle #1" },
-  { id: "Vehicle #2", label: "Vehicle #2" },
-  { id: "Vehicle #3", label: "Vehicle #3" },
-  { id: "Vehicle #4", label: "Vehicle #4" },
-  { id: "Vehicle #5", label: "Vehicle #5" },
-  { id: "Vehicle #6", label: "Vehicle #6" },
-  { id: "Vehicle #7", label: "Vehicle #7" },
-  { id: "Vehicle #8", label: "Vehicle #8" },
-  { id: "Vehicle #9", label: "Vehicle #9" },
-  { id: "Vehicle #10", label: "Vehicle #10" },
-];
+import React, {useEffect, useState } from "react";
+import VehicleDashboard from "../components/HistoryComponents/VehicleDashboard";
+
+
 
 const History = () => {
-  const [selectedCar, setSelectedCar] = useState(CAR_LIST[0].id);
-  const [speedData, setSpeedData] = useState([]);
-  const [timeLabels, setTimeLabels] = useState([]);
-
-  // random data , need Api Calls for integration
+  const [vehicles, setvehicles] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  
   useEffect(() => {
-    const interval = setInterval(() => {
-      const currentTime = new Date().toLocaleTimeString("fr-FR", {
-        hour12: false,
-      });
-      setSpeedData((prev) => [
-        ...prev.slice(-20),
-        Math.floor(Math.random() * 100) + 20,
-      ]);
-      setTimeLabels((prev) => [...prev.slice(-20), currentTime]);
-    }, 2000); // Every 2s
 
-    return () => clearInterval(interval);
-  }, [selectedCar]);
-
-  const handleCarChange = (e) => {
-    setSelectedCar(e.target.value);
-    setSpeedData([]);
-    setTimeLabels([]);
-  };
+    setIsLoading(true);
+    // #TODO : FETCH DATA FROM BACKEND
+    
+    setvehicles(mockVehicles);
+    setIsLoading(false);
+   
+  }
+  , []);
 
   return (
-    <div className="flex h-screen flex-col">
-      <div className="flex flex-1 overflow-hidden">
-        <div className="pattern-background flex flex-1 flex-col p-4 md:p-6 overflow-auto">
-          <div className="max-w-4xl mx-auto w-full space-y-6">
-            {/* Card - Vehicle Selector */}
-            <Card className="p-6">
-              <h2 className="text-2xl font-bold mb-2">Trip History</h2>
-              <p className="text-gray-600 mb-4">
-                Select a vehicle to view its data.
-              </p>
-              <div className="flex items-center gap-3">
-                <label htmlFor="car-select" className="font-medium">
-                  Vehicle :
-                </label>
-                <select
-                  id="car-select"
-                  value={selectedCar}
-                  onChange={handleCarChange}
-                  className="border rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {CAR_LIST.map((car) => (
-                    <option key={car.id} value={car.id}>
-                      {car.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </Card>
-
-            {/* Card - Chart */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                Speed History · {selectedCar}
-              </h3>
-              <p className="text-gray-500 mb-6">
-                Real-time display of previous speeds (updated every 15 seconds)
-              </p>
-
-              <CardContent className="h-72">
-                {speedData.length > 0 ? (
-                  <LineChart
-                    xAxis={[{ scaleType: "point", data: timeLabels }]}
-                    series={[
-                      {
-                        data: speedData,
-                        label: "Vitesse (km/h)",
-                        color: "#3B82F6",
-                      },
-                    ]}
-                    height={250}
-                  />
-                ) : (
-                  <div className="text-center text-gray-400 mt-10">
-                    No data available.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+    <div>
+      <div className="container mx-auto p-4">
+        <VehicleDashboard vehicles={mockVehicles} />
       </div>
     </div>
-  );
+  )
+}
+
+export default History
+
+// #TODO : REMOVE THIS MOCK DATA AND USE THE API TO FETCH DATA
+
+// generatPath function to create a path between two points addiha f controller
+const generatePath = (startLat, startLng, endLat, endLng, points) => {
+  const path = [];
+  const startTime = Date.now() - points * 60000; // One point per minute
+
+  for (let i = 0; i < points; i++) {
+    const ratio = i / (points - 1);
+    const lat = startLat + (endLat - startLat) * ratio + (Math.random() - 0.5) * 0.005;
+    const lng = startLng + (endLng - startLng) * ratio + (Math.random() - 0.5) * 0.005;
+    path.push({
+      latitude: lat,
+      longitude: lng,
+      timestamp: startTime + i * 60000
+    });
+  }
+  return path;
 };
 
-export default History;
+// Helper function to generate speed data
+const generateSpeedData = (points) => {
+  const data = [];
+  const startTime = Date.now() - points * 60000;
+  let lastSpeed = 30 + Math.random() * 30;
+
+  for (let i = 0; i < points; i++) {
+    const changeAmount = (Math.random() - 0.5) * 10;
+    lastSpeed = Math.max(5, Math.min(130, lastSpeed + changeAmount));
+
+    data.push({
+      timestamp: startTime + i * 60000,
+      speed: Math.round(lastSpeed)
+    });
+  }
+  return data;
+};
+
+const mockVehicles = [
+  {
+    id: "v1",
+    name: "Tesla Model 3",
+    model: "Model 3",
+    year: 2023,
+    licensePlate: "EV-123",
+    speedData: generateSpeedData(30),
+    locationHistory: generatePath(37.7749, -122.4194, 37.8044, -122.2711, 30) // SF to Berkeley
+  },
+  {
+    id: "v2",
+    name: "Toyota Camry",
+    model: "Camry",
+    year: 2022,
+    licensePlate: "TCY-456",
+    speedData: generateSpeedData(25),
+    locationHistory: generatePath(34.0522, -118.2437, 34.1478, -118.1445, 25) // LA to Pasadena
+  },
+  {
+    id: "v3",
+    name: "Ford F-150",
+    model: "F-150",
+    year: 2021,
+    licensePlate: "FFT-789",
+    speedData: generateSpeedData(35),
+    locationHistory: generatePath(40.7128, -74.0060, 40.7831, -73.9712, 35) // NYC to Central Park
+  },
+  {
+    id: "v4",
+    name: "Honda Civic",
+    model: "Civic",
+    year: 2023,
+    licensePlate: "HC-101",
+    speedData: generateSpeedData(28),
+    locationHistory: generatePath(41.8781, -87.6298, 42.0451, -87.6877, 28) // Chicago to Evanston
+  },
+  {
+    id: "v5",
+    name: "BMW X5",
+    model: "X5",
+    year: 2022,
+    licensePlate: "BMX-555",
+    speedData: generateSpeedData(32),
+    locationHistory: generatePath(33.7490, -84.3880, 33.9526, -84.5499, 32) // Atlanta to Marietta
+  }
+];
