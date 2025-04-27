@@ -3,8 +3,7 @@ import { DirectionsCar as CarIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axiosInstance from "../controllers/authController"; 
-
+import axiosInstance from "../controllers/authController";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -23,7 +22,6 @@ const Login = () => {
 
     setLoading(true);
 
-    
     try {
       const response = await axiosInstance.post("/auth", {
         username,
@@ -32,7 +30,7 @@ const Login = () => {
       console.log("Réponse du serveur:", response.data); // Voir la réponse
 
       if (response.status === 200) {
-        localStorage.setItem("jwt", response.data.access_token)
+        localStorage.setItem("jwt", response.data.access_token);
         localStorage.setItem("isLoggedIn", "true");
         toast.success("Login successful!");
         setTimeout(() => {
