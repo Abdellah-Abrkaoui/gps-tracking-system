@@ -7,7 +7,7 @@ from fastapi.security import HTTPBearer, OAuth2PasswordBearer
 
 from crud.user import get_user_by_username
 from db.database import Session, get_session
-from schemas.user import User
+from schemas.user import UserBase
 
 SECRET_KEY = "3d4c35d5e90faede75526fc84eeb967b4b5b3b78c34e65780c36f6db9e9c9287"  # TODO change in production
 ALGORITHM = "HS256"
@@ -59,7 +59,7 @@ def decode_jwt_token(token_to_validate: str) -> dict | None:
 
 def authenticate_user(
     username: str, password: str, session: Session = Depends(get_session)
-) -> User:
+) -> UserBase:
     user = get_user_by_username(session, username)
 
     if not user or not verify_password(password, user.password):

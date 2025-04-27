@@ -43,7 +43,7 @@ def read_location(
     return location
 
 
-@router.get("/", response_model=List[LocationRead])
+@router.get("", response_model=List[LocationRead])
 def read_locations(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
 ):

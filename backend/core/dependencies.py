@@ -9,13 +9,13 @@ from crud.license_plate_history import get_license_plate_history_by_id
 from crud.location import get_location_by_id, get_locations_by_user_id
 from crud.user import get_user_by_id
 from db.database import Session, get_session
-from schemas.user import User
+from schemas.user import UserBase
 
 
 def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: Session = Depends(get_session),
-) -> User:
+) -> UserBase:
     user_data = decode_jwt_token(token)
     if not user_data:
         raise HTTPException(
@@ -53,7 +53,7 @@ def authentication_required(
     return token
 
 
-def admin_only(user: User = Depends(get_current_user)) -> None:
+def admin_only(user: UserBase = Depends(get_current_user)) -> None:
     if not user.is_admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 

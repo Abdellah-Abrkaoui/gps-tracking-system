@@ -4,18 +4,18 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class Device(BaseModel):
+class DeviceBase(BaseModel):
     hardware_id: str
     created_at: datetime
 
 
-class DeviceCreate(Device):
+class DeviceCreate(DeviceBase):
     hardware_id: Optional[str]
 
 
-class DeviceModify(Device):
+class DeviceModify(DeviceBase):
     pass
 
 
-class DeviceRead(BaseModel):
+class DeviceRead(DeviceBase):
     id: int
