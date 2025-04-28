@@ -1,23 +1,20 @@
-// this a controller pattern for the API call
+import axiosInstance from "../controllers/axiosController";
 
-import axios from "axios";
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1/";
-const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-});
-
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("jwt");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+export const login = async (username, password) => {
+  try {
+    const response = await axiosInstance.post("/auth", { username, password });
+    if (response.status === 200) {
+      localStorage.setItem("jwt", response.data.access_token);
+      localStorage.setItem("isLoggedIn", "true");
+      return { success: true, data: response.data };
+    } else {
+      return { success: false, message: "Login failed!" };
     }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Invalid username or password!",
+    };
   }
-);
-
-export default axiosInstance;
+};

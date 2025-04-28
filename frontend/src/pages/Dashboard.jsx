@@ -6,7 +6,7 @@ import AlertsCard from "../components/AlertsCard";
 import SpeedCard from "../components/SpeedCard";
 import AlertsContainer from "../components/AlertsContainer";
 import SpeedChartCard from "../components/SpeedChartCard";
-import { fetchAverageSpeed } from "../controllers/DashController";
+import { fetchAverageSpeed } from "../controllers/dashController";
 
 
 const Dashboard = () => {
