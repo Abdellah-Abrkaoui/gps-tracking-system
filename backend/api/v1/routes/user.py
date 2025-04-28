@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-
-from core.dependencies import admin_only, authentication_required, verify_access
+from core.dependencies import (
+    admin_only,
+    authentication_required,
+    verify_access,
+    verify_self_delete_admin,
+)
 from crud.user import (
     create_user,
     delete_user,
@@ -10,6 +13,7 @@ from crud.user import (
     update_user,
 )
 from db.database import Session, get_session
+from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.user import UserCreate, UserModify, UserRead
 
 router = APIRouter(
@@ -82,6 +86,7 @@ def modify_user(
     response_model=dict,
     dependencies=[
         Depends(admin_only),
+        Depends(verify_self_delete_admin),
     ],
 )
 def delete_user_by_id(
@@ -93,4 +98,5 @@ def delete_user_by_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
     return delete_user(session, user)
