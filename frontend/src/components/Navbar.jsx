@@ -36,7 +36,7 @@ const Navbar = () => {
   const closeDropdown = () => setIsDropdownOpen(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
+    localStorage.clear();
     navigate("/login");
   };
 

@@ -15,6 +15,17 @@ from db.models import (
 
 def seed_database(engine) -> None:
     with Session(engine) as session:
+        User.metadata.drop_all(engine)
+        Device.metadata.drop_all(engine)
+        UserDeviceLink.metadata.drop_all(engine)
+        Location.metadata.drop_all(engine)
+        LicensePlateHistory.metadata.drop_all(engine)
+
+        User.metadata.create_all(engine)
+        Device.metadata.create_all(engine)
+        UserDeviceLink.metadata.create_all(engine)
+        Location.metadata.create_all(engine)
+        LicensePlateHistory.metadata.create_all(engine)
         users_data = [
             {
                 "username": "admin",

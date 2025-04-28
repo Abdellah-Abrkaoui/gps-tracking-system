@@ -1,13 +1,12 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { isLoggedIn } from "../utils/authHelper";
 
 const RequireAuth = ({ children }) => {
-  const isLoggedIn = localStorage.getItem("isLoggedIn"); // just for now , after backend integration we will use jwt
-
-  if (!isLoggedIn) {
+  if (!isLoggedIn()) {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
+  return children ? children : <Outlet />;
 };
 
 export default RequireAuth;

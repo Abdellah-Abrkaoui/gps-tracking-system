@@ -3,6 +3,7 @@ import userController from "../controllers/userController";
 import AddUserModal from "../components/users/AddUserModal";
 import EditUserModal from "../components/users/EditUserModal";
 import { AdUnits } from "@mui/icons-material";
+// import { getUserRole } from "../utils/authHelper";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
