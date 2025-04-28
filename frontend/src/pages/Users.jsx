@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import userController from "../controllers/userController";
 import AddUserModal from "../components/users/AddUserModal";
 import EditUserModal from "../components/users/EditUserModal";
+import UserCard from "../components/users/UserCard";
 import { AdUnits } from "@mui/icons-material";
-// import { getUserRole } from "../utils/authHelper";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -12,6 +12,7 @@ const Users = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [newUser, setNewUser] = useState({
     username: "",
@@ -28,14 +29,8 @@ const Users = () => {
     devices: [],
   });
 
-  // Pagination constants
   const usersPerPage = 5;
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(users.length / usersPerPage);
 
-  // Fetch all users on component mount
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -79,7 +74,6 @@ const Users = () => {
 
   const handleUpdateUser = async () => {
     try {
-      // Only send password if it's not empty
       const userToUpdate = {
         ...editUser,
         ...(editUser.password ? {} : { password: undefined }),
@@ -96,7 +90,6 @@ const Users = () => {
 
   const handleDelete = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-
     try {
       await userController.deleteUser(userId);
       setUsers(users.filter((user) => user.id !== userId));
@@ -106,37 +99,44 @@ const Users = () => {
     }
   };
 
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      <UserCard
+        searchTerm={searchTerm}
+        userCount={currentUsers.length}
+        totalUsers={users.length}
+        onAddUser={() => setShowAddModal(true)}
+        onSearch={setSearchTerm}
+        isLoading={isLoading}
+      />
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded relative">
           {error}
           <button
             onClick={() => setError(null)}
-            className="float-right font-bold"
+            className="absolute top-2 right-2 font-bold"
           >
             ×
           </button>
         </div>
       )}
 
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          disabled={isLoading}
-        >
-          {isLoading ? "Loading..." : "Add User"}
-        </button>
-      </div>
-
       {isLoading && users.length === 0 ? (
         <div className="text-center py-8">Loading users...</div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto mt-6">
+            {/* Old User Table */}
             <table className="min-w-full bg-white border border-gray-200">
               <thead>
                 <tr className="bg-gray-100">
@@ -193,14 +193,14 @@ const Users = () => {
           </div>
 
           {/* Pagination */}
-          {users.length > 0 && (
-            <div className="flex justify-center mt-4">
+          {filteredUsers.length > 0 && (
+            <div className="flex justify-center mt-6">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 mx-1 border rounded disabled:opacity-50"
               >
-                &lt; Previous
+                &lt; Prev
               </button>
 
               {Array.from({ length: totalPages }, (_, i) => (
@@ -208,7 +208,9 @@ const Users = () => {
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
                   className={`px-4 py-2 mx-1 border rounded ${
-                    currentPage === i + 1 ? "bg-blue-500 text-white" : ""
+                    currentPage === i + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-white"
                   }`}
                 >
                   {i + 1}
