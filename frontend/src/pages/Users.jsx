@@ -70,7 +70,7 @@ const Users = () => {
       setShowAddModal(false);
       setNewUser({ username: "", password: "", is_admin: false, devices: [] });
       await fetchUsers();
-    } catch (error) {
+   }catch (error) {
       setError(error.message || "Failed to add user");
       console.error("Error adding user:", error);
     }

@@ -51,7 +51,7 @@ const userController = {
 
   updateUser: async (userId, userData) => {
     try {
-      const response = await axiosInstance.put(`/users/${userId}`, userData);
+      const response = await axiosInstance.patch(`/users/${userId}`, userData);
       return response.data;
     } catch (error) {
       console.error(`Error updating user with ID ${userId}:`, error);
