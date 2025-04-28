@@ -8,6 +8,8 @@ class UserBase(BaseModel):
     is_admin: Optional[bool] = False
     devices: Optional[List[int]] = None
 
+    class Config:
+        from_attributes = True
 
 class UserCreate(UserBase):
     password: str
