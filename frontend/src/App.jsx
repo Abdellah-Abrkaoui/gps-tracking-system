@@ -2,11 +2,11 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import "./App.css";
 import Layout from "./components/Layout";
 import History from "./pages/History";
 import Users from "./pages/Users";
 import RequireAuth from "./components/RequireAuth";
+import AdminRoute from "./utils/adminRoute";
 
 function App() {
   return (
@@ -25,7 +25,14 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="history" element={<History />} />
-            <Route path="users" element={<Users />} />
+            <Route
+              path="users"
+              element={
+                <AdminRoute>
+                  <Users />
+                </AdminRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
