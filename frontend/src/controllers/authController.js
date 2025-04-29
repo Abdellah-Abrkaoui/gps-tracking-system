@@ -1,5 +1,4 @@
 import axiosInstance from "../controllers/axiosController";
-import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 
 export const login = async (username, password, navigate) => {
@@ -24,13 +23,9 @@ export const login = async (username, password, navigate) => {
       return { success: true }; // Good practice to return success
     }
   } catch (error) {
-    console.error(error);
-    toast.error(
-      error.response?.data?.message || "Invalid username or password!"
-    );
     return {
       success: false,
-      message: error.response?.data?.message || "Invalid username or password!",
+      message: error.response?.data?.detail || "Invalid username or password!",
     };
   }
 };
