@@ -10,9 +10,7 @@ def seed_database(engine) -> None:
         super_admin = session.exec(select(User).where(User.username == "admin")).first()
         if not super_admin:
             super_admin = User(
-                username="admin",
-                password=get_password_hash("admin"),
-                is_admin=True
+                username="admin", password=get_password_hash("admin"), is_admin=True
             )
             session.add(super_admin)
             session.commit()
@@ -20,16 +18,20 @@ def seed_database(engine) -> None:
         users = [super_admin]
         for i in range(10):
             for is_admin in [True, False]:
-                username = f"{'admin' if is_admin else 'user'}{i+1}"
-                existing = session.exec(select(User).where(User.username == username)).first()
+                username = f"{'admin' if is_admin else 'user'}{i + 1}"
+                existing = session.exec(
+                    select(User).where(User.username == username)
+                ).first()
                 if not existing:
+                    raw_password = "admin" if is_admin else "password"
                     user = User(
                         username=username,
-                        password=get_password_hash("password"),
-                        is_admin=is_admin
+                        password=get_password_hash(raw_password),
+                        is_admin=is_admin,
                     )
                     session.add(user)
                     users.append(user)
+
         session.commit()
 
         devices = []
@@ -53,7 +55,7 @@ def seed_database(engine) -> None:
                 exists = session.exec(
                     select(UserDeviceLink).where(
                         UserDeviceLink.user_id == user.id,
-                        UserDeviceLink.device_id == device.id
+                        UserDeviceLink.device_id == device.id,
                     )
                 ).first()
                 if not exists:
@@ -82,7 +84,7 @@ def seed_database(engine) -> None:
                     device_id=device.id,
                     license_plate=f"PLATE{device.id}{i}",
                     start_date=start,
-                    end_date=end
+                    end_date=end,
                 )
                 session.add(plate)
         session.commit()
