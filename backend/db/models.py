@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from sqlmodel import JSON, Column, Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class User(SQLModel, table=True):
@@ -11,11 +11,14 @@ class User(SQLModel, table=True):
     username: str = Field(index=True, unique=True)
     password: str
     is_admin: Optional[bool] = False
-    devices: list[int] | None = Field(default=None, sa_column=Column(JSON))
 
     user_device_links: List["UserDeviceLink"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"cascade": "all, delete"}
     )
+
+    @property
+    def devices(self) -> List[int]:
+        return [link.device_id for link in self.user_device_links]
 
 
 class Device(SQLModel, table=True):
