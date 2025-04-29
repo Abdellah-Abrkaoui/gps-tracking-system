@@ -20,14 +20,14 @@ const Navbar = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const formattedDate = currentTime.toLocaleDateString("fr-FR", {
+  const formattedDate = currentTime.toLocaleDateString("en-EN", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 
-  const formattedTime = currentTime.toLocaleTimeString("fr-FR", {
+  const formattedTime = currentTime.toLocaleTimeString("en-EN", {
     hour: "2-digit",
     minute: "2-digit",
   });

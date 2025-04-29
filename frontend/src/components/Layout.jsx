@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import {
+  AdUnits,
   Dashboard as DashboardIcon,
   History as HistoryIcon,
   GroupAdd as UserIcon,
@@ -45,18 +46,32 @@ const Layout = () => {
           </NavLink>
 
           {role === "admin" && (
-            <NavLink
-              to="/users"
-              className={({ isActive }) =>
-                `flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "text-[#1E3A8A] bg-blue-50"
-                    : "text-gray-600 hover:text-[#1E3A8A] hover:bg-blue-50"
-                }`
-              }
-            >
-              <UserIcon fontSize="small" />
-            </NavLink>
+            <>
+              <NavLink
+                to="/users"
+                className={({ isActive }) =>
+                  `flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? "text-[#1E3A8A] bg-blue-50"
+                      : "text-gray-600 hover:text-[#1E3A8A] hover:bg-blue-50"
+                  }`
+                }
+              >
+                <UserIcon fontSize="small" />
+              </NavLink>
+              <NavLink
+                to="/devices"
+                className={({ isActive }) =>
+                  `flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? "text-[#1E3A8A] bg-blue-50"
+                      : "text-gray-600 hover:text-[#1E3A8A] hover:bg-blue-50"
+                  }`
+                }
+              >
+                <AdUnits fontSize="small" />
+              </NavLink>
+            </>
           )}
         </div>
 

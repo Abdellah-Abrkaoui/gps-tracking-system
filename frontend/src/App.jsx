@@ -7,6 +7,7 @@ import History from "./pages/History";
 import Users from "./pages/Users";
 import RequireAuth from "./components/RequireAuth";
 import AdminRoute from "./utils/adminRoute";
+import Devices from "./pages/Devices";
 
 function App() {
   return (
@@ -30,6 +31,14 @@ function App() {
               element={
                 <AdminRoute>
                   <Users />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="devices"
+              element={
+                <AdminRoute>
+                  <Devices />
                 </AdminRoute>
               }
             />
