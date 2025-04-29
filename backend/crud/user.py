@@ -1,6 +1,8 @@
 from sqlmodel import Session
 
-from db.models import User
+from fastapi import HTTPException, status
+
+from db.models import Device, User, UserDeviceLink
 from schemas.user import UserCreate, UserModify, UserRead
 
 
@@ -42,7 +44,34 @@ def update_user(session: Session, user: User, user_update_data: UserModify) -> U
         user_update_data.password = get_password_hash(user_update_data.password)
 
     user_data = user_update_data.model_dump(exclude_unset=True)
+
     user.sqlmodel_update(user_data)
+
+    # handle device updates
+    if user_update_data.devices is not None:
+        # first clear the existing user-device links
+        existing_device_links = (
+            session.query(UserDeviceLink)
+            .filter(UserDeviceLink.user_id == user.id)
+            .all()
+        )
+        for link in existing_device_links:
+            session.delete(link)
+
+        # now we add the new device links based on the provided device IDs
+        for device_id in user_update_data.devices:
+            # check if the device exists
+            device = session.query(Device).filter(Device.id == device_id).first()
+            if not device:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Device with id {device_id} not found.",
+                )
+
+            # create and add a new UserDeviceLink entry
+            new_link = UserDeviceLink(user_id=user.id, device_id=device_id)
+            session.add(new_link)
+
     session.add(user)
     session.commit()
     session.refresh(user)
