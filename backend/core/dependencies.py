@@ -36,8 +36,11 @@ def verify_access(
     token: str = Depends(oauth2_scheme),
 ) -> None:
     token = decode_jwt_token(token)
-    if user_id != token["id"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    if not token["is_admin"]:
+        if user_id != token["id"]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
+            )
 
 
 def verify_self_delete_admin(
