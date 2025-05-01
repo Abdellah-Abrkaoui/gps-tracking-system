@@ -1,0 +1,18 @@
+services:
+  test:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+      - ./report:/app/report
+    working_dir: /app
+    command: sh -c "pytest test/ --html=report/report.html"
+    networks:
+      - backend-network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  backend-network:
+    external: false
