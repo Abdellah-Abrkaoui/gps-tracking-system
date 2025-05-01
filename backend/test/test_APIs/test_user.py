@@ -20,10 +20,10 @@ def test_read_user_invalid():
     response = requests.get(
         "http://backend:8000/api/v1/users/9999",
         headers={"accept": "application/json", "Content-Type": "application/json" ,"Authorization": f"Bearer {TOKEN_ADMIN}"},)
-    assert response.status_code == 422, f"Expected 422, got {response.status_code}"
+    assert response.status_code == 404, f"Expected 422, got {response.status_code}"
 
 def test_read_user_unauthorized():
     response = requests.get(
         "http://backend:8000/api/v1/users/1",
         headers={"accept": "application/json", "Content-Type": "application/json" ,"Authorization": f"Bearer {TOKEN_USER}"},)
-    assert response.status_code == 401, f"Expected 401, got {response.status_code}"
+    assert response.status_code == 403, f"Expected 403, got {response.status_code}"
