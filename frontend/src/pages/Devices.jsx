@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+//import React, { useState } from "react";
 import DevicesCard from "../components/devices/DevicesCard";
 import DeviceTable from "../components/devices/DevicesTable";
 import Pagination from "../components/devices/Pagination";
 import Modal from "../components/devices/Modal";
 import DeviceDetails from "../components/devices/DeviceDetails";
-import { dummyDevices } from "../assets/data/devicesDummy";
+import deviceController from "../controllers/DevicesController";
+import { useState, useEffect } from "react";
+
 
 function Devices() {
-  const [allDevices, setAllDevices] = useState(dummyDevices);
-  const [devices, setDevices] = useState(dummyDevices);
+  const [allDevices, setAllDevices] = useState([]); // Remplace dummyDevices par tableau vide
+  const [devices, setDevices] = useState([]); // Idem
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [currentDevice, setCurrentDevice] = useState(null);
@@ -28,6 +30,29 @@ function Devices() {
   const currentDevices = devices.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(devices.length / itemsPerPage);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+
+   const fetchDevices = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const devicesData = await deviceController.getAllDevices();
+      console.log("Données reçues:", devicesData); // Check data 
+      setDevices(devicesData);
+    } catch (err) {
+      console.error("Erreur complète:", err); // Log error
+      setError(err.message || "Failed to load devices");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
   const resetForm = () => {
     setFormData({
       id: "",
@@ -35,6 +60,9 @@ function Devices() {
       createdAt: "",
     });
   };
+
+
+  
 
   const handleAddDevice = () => {
     setCurrentDevice(null);
@@ -64,27 +92,36 @@ function Devices() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isEditing) {
-      const updatedDevices = allDevices.map((d) =>
-        d.id === currentDevice.id ? formData : d
-      );
-      setAllDevices(updatedDevices);
-      setDevices(updatedDevices);
-    } else {
-      const newDevice = {
-        ...formData,
-        id: `DEV-${Math.floor(Math.random() * 10000)}`, // random id
-        createdAt: new Date().toISOString(),
-      };
-      const updatedDevices = [newDevice, ...allDevices];
-      setAllDevices(updatedDevices);
-      setDevices(updatedDevices);
-    }
-    setIsModalOpen(false);
+    setIsLoading(true);
+    setError(null);
+  
+    try {
+      if (isEditing) {
+        const updatedDevice = {
+          hardwareId: formData.hardwareId,
+        };
+        await deviceController.updateDevice(formData.id, updatedDevice);
+      } else {
+        const newDevice = {
+          hardwareId: formData.hardwareId,
+        };
+        await deviceController.createDevice(newDevice);
+      }
+  
+      await fetchDevices(); // recharge les données depuis le backend
+      setIsModalOpen(false);
+      resetForm();
+    } catch (err) {
+      setError(err.message || "Erreur lors de la soumission");
+      console.error("Submit error:", err);
+    } finally {
+      setIsLoading(false);
+    }setIsModalOpen(false);
     resetForm();
   };
+  
 
   const handleDeleteDevice = (deviceId) => {
     const updatedDevices = allDevices.filter((d) => d.id !== deviceId);
