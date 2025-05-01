@@ -38,7 +38,7 @@ def seed_database(engine) -> None:
         for i in range(1, 11):
             device = session.get(Device, i)
             if not device:
-                device = Device(id=i, hardware_id=randint(1000000, 9999999))
+                device = Device(id=i, hardware_id=str(randint(1000000, 9999999)))
                 session.add(device)
             devices.append(device)
         session.commit()
