@@ -1,19 +1,16 @@
-import pytest
+
 import requests
 
 
-def test_Auth() -> str:
-    # Test user registration
-    response = requests.post(
-        "http://localhost:8000/api/v1/auth",
-        json={
-            "username": "testuser",
-            "password": "testpassword",
-        })
-    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-    if response.status_code != 200:
-        print(f"Response content: {response.json().get("msg")}")
-    assert response.json().get("access_token") is not None, "Access token not found in response"
-    return response.json().get("access_token")
 
+def test_auth():
+    response = requests.post(
+    "http://backend:8000/api/v1/auth",
+    headers={"accept": "application/json", "Content-Type": "application/json"},
+    json={"username": "admin", "password": "admin"}
+)
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+    data = response.json()
+    assert "access_token" in data, "Access token not found"
+    return data["access_token"]
 
