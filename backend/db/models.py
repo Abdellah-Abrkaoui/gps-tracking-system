@@ -25,7 +25,7 @@ class Device(SQLModel, table=True):
     __tablename__ = "devices"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    hardware_id: int
+    hardware_id: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     user_device_links: List["UserDeviceLink"] = Relationship(
