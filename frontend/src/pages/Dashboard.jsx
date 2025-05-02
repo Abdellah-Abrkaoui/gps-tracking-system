@@ -1,42 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import CarMap from "../components/CarMap";
-import vehicles from "../assets/data/carsDummy";
-import ActiveVehiclesCard from "../components/ActiveVehiclesCard";
-import AlertsCard from "../components/AlertsCard";
-import SpeedCard from "../components/SpeedCard";
-import AlertsContainer from "../components/AlertsContainer";
-import SpeedChartCard from "../components/SpeedChartCard";
-import { fetchAverageSpeed } from "../controllers/dashController";
-
+import VehicleStatsCards from "../components/dashboard/VehicleCard";
 
 const Dashboard = () => {
-  const activeVehicles = vehicles.length;
-  const alertsToday = 4;
-  const [averageSpeed, setAverageSpeed] = useState(0);
-
-
-  
-  useEffect(() => {
-    const getSpeed = async () => {
-      const avgSpeed = await fetchAverageSpeed();
-      setAverageSpeed(avgSpeed);
-    }
-    getSpeed();
-  }, []);
-
-
   return (
-    <div className="p-4 h-full flex justify-between gap-3">
-      <div className="w-[70%] h-[85vh] bg-white rounded-lg shadow-md">
-        <CarMap />
+    <div className="p-2 h-full flex flex-col lg:flex-row gap-2">
+      {/* Left Main Section */}
+      <div className="flex-1 flex flex-col gap-2">
+        {/* Top Stats Cards */}
+        <VehicleStatsCards />
+
+        {/* Map */}
+        <div className="h-[70vh] bg-white rounded-lg shadow-md">
+          <CarMap />
+        </div>
       </div>
 
-      <div className="w-[30%] p-4 bg-white rounded-lg shadow-md flex flex-col gap-4">
-        <ActiveVehiclesCard count={activeVehicles} />
-        <AlertsCard count={alertsToday} />
-        <SpeedCard speed={averageSpeed} />
-        <SpeedChartCard />
-        <AlertsContainer />
+      {/* Right Sidebar */}
+      <div className="w-full lg:w-[25%] h-[90vh] bg-white rounded-lg shadow-md">
+        {/* Add your sidebar content here */}
+        <div className="p-4 text-gray-700 font-medium">Sidebar content...</div>
       </div>
     </div>
   );
