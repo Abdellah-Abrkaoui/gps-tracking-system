@@ -36,31 +36,19 @@ def list_license_plate_history_by_device_id(
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
 ):
-    return get_license_plate_history_by_device(session, device_id)
-
-
-@router.get(
-    "/{history_id}",
-    response_model=LicensePlateHistoryRead,
-    dependencies=[Depends(verify_license_plate_history_access)],
-)
-def read_license_plate_histories_by_history_id(
-    history_id: int,
-    session: Session = Depends(get_session),
-):
-    license_plate_history = get_license_plate_history_by_id(session, history_id)
+    license_plate_history = get_license_plate_history_by_device(session, device_id)
     if not license_plate_history:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="license plate history not found",
         )
+
     return license_plate_history
 
 
 @router.get(
     "",
     response_model=List[LicensePlateHistoryRead],
-    dependencies=[Depends(verify_license_plate_history_access)],
 )
 def read_license_plate_histories(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
