@@ -2,8 +2,7 @@ from typing import List
 
 from sqlmodel import Session
 
-from db.models import Location
-from schemas.user_device_link import UserDeviceLink
+from db.models import Location, UserDeviceLink
 
 
 def get_location_by_id(session: Session, location_id: int) -> Location | None:
