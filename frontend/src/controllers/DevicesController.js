@@ -6,8 +6,13 @@ const deviceController = {
       const response = await axiosInstance.get("/devices");
       return response.data;
     } catch (error) {
-      console.error("Error fetching all devices:", error.response?.data?.detail);
-      throw new Error(error.response?.data?.detail || "Failed to fetch devices");
+      console.error(
+        "Error fetching all devices:",
+        error.response?.data?.detail
+      );
+      throw new Error(
+        error.response?.data?.detail || "Failed to fetch devices"
+      );
     }
   },
 
@@ -16,7 +21,10 @@ const deviceController = {
       const response = await axiosInstance.get(`/devices/${deviceId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching device with ID ${deviceId}:`, error.response?.data?.detail);
+      console.error(
+        `Error fetching device with ID ${deviceId}:`,
+        error.response?.data?.detail
+      );
       throw new Error(error.response?.data?.detail || "Failed to fetch device");
     }
   },
@@ -27,17 +35,27 @@ const deviceController = {
       return response.data;
     } catch (error) {
       console.error("Error creating device:", error.response?.data?.detail);
-      throw new Error(error.response?.data?.detail || "Failed to create device");
+      throw new Error(
+        error.response?.data?.detail || "Failed to create device"
+      );
     }
   },
 
   updateDevice: async (deviceId, deviceData) => {
     try {
-      const response = await axiosInstance.patch(`/devices/${deviceId}`, deviceData);
+      const response = await axiosInstance.patch(
+        `/devices/${deviceId}`,
+        deviceData
+      );
       return response.data;
     } catch (error) {
-      console.error(`Error updating device with ID ${deviceId}:`, error.response?.data?.detail);
-      throw new Error(error.response?.data?.detail || "Failed to update device");
+      console.error(
+        `Error updating device with ID ${deviceId}:`,
+        error.response?.data?.detail
+      );
+      throw new Error(
+        error.response?.data?.detail || "Failed to update device"
+      );
     }
   },
 
@@ -46,8 +64,13 @@ const deviceController = {
       const response = await axiosInstance.delete(`/devices/${deviceId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error deleting device with ID ${deviceId}:`, error.response?.data?.detail);
-      throw new Error(error.response?.data?.detail || "Failed to delete device");
+      console.error(
+        `Error deleting device with ID ${deviceId}:`,
+        error.response?.data?.detail
+      );
+      throw new Error(
+        error.response?.data?.detail || "Failed to delete device"
+      );
     }
   },
 };
