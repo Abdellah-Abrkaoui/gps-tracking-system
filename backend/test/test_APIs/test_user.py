@@ -1,5 +1,5 @@
 import requests
-from test_auth import get_token_admin, get_token_user
+from .test_auth import get_token_admin, get_token_user
 
 TOKEN_ADMIN = get_token_admin()
 TOKEN_USER = get_token_user()
@@ -27,3 +27,4 @@ def test_read_user_unauthorized():
         "http://backend:8000/api/v1/users/1",
         headers={"accept": "application/json", "Content-Type": "application/json" ,"Authorization": f"Bearer {TOKEN_USER}"},)
     assert response.status_code == 403, f"Expected 403, got {response.status_code}"
+
