@@ -17,17 +17,37 @@ const devices = [
   {
     id: 4,
     hardware_id: "LMN400",
-    created_at: "2025-05-01T08:30:00Z",
+    created_at: "2025-05-01T09:30:00Z",
   },
   {
     id: 5,
     hardware_id: "LMN500",
-    created_at: "2025-05-01T07:30:00Z",
+    created_at: "2025-05-01T09:30:00Z",
   },
   {
     id: 6,
     hardware_id: "LMN600",
-    created_at: "2025-05-01T06:30:00Z",
+    created_at: "2025-05-01T09:30:00Z",
+  },
+  {
+    id: 7,
+    hardware_id: "DEF321",
+    created_at: "2025-05-02T08:15:00Z",
+  },
+  {
+    id: 8,
+    hardware_id: "GHI654",
+    created_at: "2025-05-02T09:45:00Z",
+  },
+  {
+    id: 9,
+    hardware_id: "JKL987",
+    created_at: "2025-05-03T07:30:00Z",
+  },
+  {
+    id: 10,
+    hardware_id: "MNO246",
+    created_at: "2025-05-03T10:20:00Z",
   },
 ];
 

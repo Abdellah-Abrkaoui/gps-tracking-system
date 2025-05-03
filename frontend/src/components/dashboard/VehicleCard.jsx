@@ -1,7 +1,7 @@
 import React from "react";
-import { Car, Clock, Battery } from "lucide-react";
-import devices from "../../assets/data/devices";
-import locations from "../../assets/data/locations";
+import { Car, Clock, Gauge } from "lucide-react";
+import devices from "../../assets/data/locations.js";
+import locations from "../../assets/data/locations.js";
 import users from "../../assets/data/usersDummy.js";
 
 function VehicleCard() {
@@ -46,7 +46,7 @@ function VehicleCard() {
       : new Date();
 
   return (
-    <div className="flex flex-wrap gap-4 p-2 pt-4">
+    <div className="flex flex-wrap gap-4 p-2 pt-1">
       {/* Total Vehicles */}
       <div className="flex-1 min-w-[250px] p-4 rounded-lg shadow-md bg-white text-gray-800">
         <div className="flex justify-between items-center">
@@ -68,7 +68,7 @@ function VehicleCard() {
             <h3 className="text-2xl font-bold">{averageSpeed} km/h</h3>
           </div>
           <div className="p-3 rounded-full bg-green-100 text-green-700">
-            <Battery size={24} />
+            <Gauge size={24} />
           </div>
         </div>
         <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
