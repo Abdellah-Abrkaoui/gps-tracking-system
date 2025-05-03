@@ -2,9 +2,8 @@ from typing import List
 
 from sqlmodel import Session
 
-from db.models import Device
+from db.models import Device, UserDeviceLink
 from schemas.device import DeviceCreate, DeviceModify, DeviceRead
-from schemas.user_device_link import UserDeviceLink
 
 
 def get_device_by_id(session: Session, device_id: int) -> Device | None:
