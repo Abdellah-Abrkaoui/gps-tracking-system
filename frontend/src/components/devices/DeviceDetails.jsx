@@ -39,7 +39,7 @@ const DeviceDetails = ({ device, onClose, isOpen }) => {
               <div className="min-w-0">
                 <p className="text-sm text-gray-500 font-medium">Hardware ID</p>
                 <p className="text-gray-900 font-mono truncate">
-                  {device.hardwareId}
+                  {device.hardware_id}
                 </p>
               </div>
             </div>
@@ -50,7 +50,7 @@ const DeviceDetails = ({ device, onClose, isOpen }) => {
                 <p className="text-sm text-gray-500 font-medium">
                   Creation Date
                 </p>
-                <p className="text-gray-900">{formatDate(device.createdAt)}</p>
+                <p className="text-gray-900">{formatDate(device.created_at)}</p>
               </div>
             </div>
           </div>

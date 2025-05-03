@@ -1,4 +1,3 @@
-//import React, { useState } from "react";
 import DevicesCard from "../components/devices/DevicesCard";
 import DeviceTable from "../components/devices/DevicesTable";
 import Pagination from "../components/devices/Pagination";
@@ -44,6 +43,7 @@ function Devices() {
       const devicesData = await deviceController.getAllDevices();
       console.log("Données reçues:", devicesData); // Check data 
       setDevices(devicesData);
+      setAllDevices(devicesData)
     } catch (err) {
       console.error("Erreur complète:", err); // Log error
       setError(err.message || "Failed to load devices");
@@ -98,39 +98,47 @@ function Devices() {
     setError(null);
   
     try {
+      // Formatage des données pour l'API
+      const devicedata = {
+        hardware_id: formData.hardwareId,
+        // Si API attend une date specifique
+        created_at: formData.createdAt || new Date().toISOString(),
+      };
+  
       if (isEditing) {
-        const updatedDevice = {
-          hardwareId: formData.hardwareId,
-        };
-        await deviceController.updateDevice(formData.id, updatedDevice);
+        await deviceController.updateDevice(currentDevice.id, devicedata);
       } else {
-        const newDevice = {
-          hardwareId: formData.hardwareId,
-        };
-        await deviceController.createDevice(newDevice);
+        await deviceController.createDevice(devicedata);
       }
   
-      await fetchDevices(); // recharge les données depuis le backend
-      setIsModalOpen(false);
-      resetForm();
+      
     } catch (err) {
-      setError(err.message || "Erreur lors de la soumission");
-      console.error("Submit error:", err);
+      console.error("Operation failed:", err);
+      setError(err.response?.data?.message || err.message || "Operation failed");
     } finally {
       setIsLoading(false);
-    }setIsModalOpen(false);
-    resetForm();
+      setIsModalOpen(false);
+      resetForm();
+      await fetchDevices();
+        }
   };
-  
 
-  const handleDeleteDevice = (deviceId) => {
-    const updatedDevices = allDevices.filter((d) => d.id !== deviceId);
-    setAllDevices(updatedDevices);
-    setDevices(updatedDevices);
-    if (currentDevices.length === 1 && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+    const handleDeleteDevice = async (deviceId) => {
+      if (!window.confirm("Are you sure you want to delete this device?")) return;
+      try {
+        await deviceController.deleteDevice(deviceId);
+        setAllDevices(allDevices.filter((device) => device.id !== deviceId));
+        setDevices(devices.filter((device) => device.id !== deviceId));
+        if (currentDevices.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+      } catch (error) {
+        // Gestion des erreurs
+        setError(error.message || "Failed to delete device");
+        console.error("Error deleting device:", error);
+      }
+    };
+    
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -190,7 +198,7 @@ function Devices() {
               <input
                 type="text"
                 name="hardwareId"
-                value={formData.hardwareId}
+                value={formData.hardwareId || ""}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border rounded-md"
                 required

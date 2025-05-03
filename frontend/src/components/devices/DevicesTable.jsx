@@ -115,10 +115,10 @@ const DeviceTable = ({ devices, onView, onEdit, onDelete }) => {
                       {device.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {device.hardwareId}
+                      {device.hardware_id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(device.createdAt)}
+                      {formatDate(device.created_at)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
@@ -183,7 +183,8 @@ const DeviceTable = ({ devices, onView, onEdit, onDelete }) => {
                         <button
                           onClick={() => onView(device)}
                           className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50"
-                          title="View details"
+                          title="
+                          "
                         >
                           <EyeIcon className="h-4 w-4" />
                         </button>
