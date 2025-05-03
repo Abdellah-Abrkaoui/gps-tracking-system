@@ -98,8 +98,6 @@ const Markers = ({ locations, devices, selectedDevice }) => {
       }
     }
   }, [selectedDevice, locations, map]);
-  console.log("Rendering Markers for:", locations);
-  console.log("Sample:", locations[0]);
 
   return locations
     .filter(
@@ -140,9 +138,6 @@ function CarMap({ selectedDevice }) {
   const visibleLocations = locations.filter((loc) =>
     visibleDeviceIds.includes(loc.device_id)
   );
-
-  console.log("Visible devices:", visibleDeviceIds);
-  console.log("Filtered locations:", visibleLocations);
 
   return (
     <div style={{ height: "100%", width: "100%", position: "relative" }}>
