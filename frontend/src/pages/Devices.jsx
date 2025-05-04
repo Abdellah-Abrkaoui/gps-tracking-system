@@ -145,18 +145,23 @@ function Devices() {
   };
 
   const handleSearch = (term) => {
-    setSearchTerm(term);
-    if (term.trim() === "") {
+    const searchTerm = term.trim().toLowerCase();
+    setSearchTerm(searchTerm);
+  
+    if (searchTerm === "") {
       setDevices(allDevices);
-    } else {
-      const filtered = allDevices.filter(
-        (device) =>
-          device.id.toLowerCase().includes(term.toLowerCase()) ||
-          device.hardwareId.toLowerCase().includes(term.toLowerCase())
-      );
-      setDevices(filtered);
       setCurrentPage(1);
+      return;
     }
+  
+    const filteredDevices = allDevices.filter((device) => {
+      const deviceId = device.id?.toString().toLowerCase() || "";
+      const hardware_id = device.hardware_id?.toString().toLowerCase() || "";
+      return deviceId.includes(searchTerm) || hardware_id.includes(searchTerm);
+    });
+  
+    setDevices(filteredDevices);
+    setCurrentPage(1);
   };
 
   return (
