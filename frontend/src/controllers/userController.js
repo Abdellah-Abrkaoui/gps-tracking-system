@@ -16,7 +16,10 @@ const userController = {
       const response = await axiosInstance.get(`/users/${userId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching user with ID ${userId}:`, error.response?.data?.detail);
+      console.error(
+        `Error fetching user with ID ${userId}:`,
+        error.response?.data?.detail
+      );
       throw new Error(error.response?.data?.detail || "Failed to fetch user");
     }
   },
@@ -36,7 +39,10 @@ const userController = {
       const response = await axiosInstance.patch(`/users/${userId}`, userData);
       return response.data;
     } catch (error) {
-      console.error(`Error updating user with ID ${userId}:`, error.response?.data?.detail);
+      console.error(
+        `Error updating user with ID ${userId}:`,
+        error.response?.data?.detail
+      );
       throw new Error(error.response?.data?.detail || "Failed to update user");
     }
   },
@@ -46,7 +52,10 @@ const userController = {
       const response = await axiosInstance.delete(`/users/${userId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error deleting user with ID ${userId}:`, error.response?.data?.detail);
+      console.error(
+        `Error deleting user with ID ${userId}:`,
+        error.response?.data?.detail
+      );
       throw new Error(error.response?.data?.detail || "Failed to delete user");
     }
   },

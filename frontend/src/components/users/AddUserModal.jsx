@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import allDevices from "../../assets/data/allDevices"; // this will be replace after with Devices API
+import React, { useEffect, useState } from "react";
+import deviceController from "../../controllers/DevicesController.js";
 
 const AddUserModal = ({
   show,
@@ -12,6 +12,26 @@ const AddUserModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  // use state for storing devices
+
+  const [devices, setDevices] = useState([]);
+  const [devicesLoading, setDevicesLoading] = useState(true);
+
+  // use effect to fetch devices from DevicesController
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const data = await deviceController.getAllDevices();
+        setDevices(data);
+      } catch (error) {
+        console.log("Failed to feetch Devices", error);
+      } finally {
+        setDevicesLoading(false);
+      }
+    };
+    fetchDevices();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,23 +147,30 @@ const AddUserModal = ({
                 Assign Devices
               </label>
               <div className="max-h-40 overflow-y-auto rounded-md border border-gray-300 p-3 space-y-2">
-                {allDevices.map((device) => (
-                  <div key={device.id} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id={`device-${device.id}`}
-                      checked={newUser.devices.includes(device.id)}
-                      onChange={() => handleDeviceToggle(device.id)}
-                      className="h-4 w-4"
-                    />
-                    <label
-                      htmlFor={`device-${device.id}`}
-                      className="text-sm text-gray-700"
-                    >
-                      {device.name || `Device ${device.id}`}
-                    </label>
-                  </div>
-                ))}
+                {devicesLoading ? (
+                  <p className="text-sm text-gray-500">Loading devices...</p>
+                ) : (
+                  devices
+                    .slice()
+                    .sort((a, b) => a.id - b.id)
+                    .map((device) => (
+                      <div key={device.id} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id={`device-${device.id}`}
+                          checked={newUser.devices.includes(device.id)}
+                          onChange={() => handleDeviceToggle(device.id)}
+                          className="h-4 w-4"
+                        />
+                        <label
+                          htmlFor={`device-${device.id}`}
+                          className="text-sm text-gray-700"
+                        >
+                          {`Device ${device.id}`}
+                        </label>
+                      </div>
+                    ))
+                )}
               </div>
             </div>
 
