@@ -19,7 +19,9 @@ function DevicePopup({ device, location }) {
             <Gauge className="h-4 w-4 text-blue-600" />
           </div>
           <p className="text-gray-700 text-sm">
-            <span className="font-medium">{location.speed}</span> km/h
+            <span className="font-medium">
+              {location.speed ? location.speed.toFixed(2) : "0.00"} km/h
+            </span>
           </p>
         </div>
 
@@ -28,7 +30,9 @@ function DevicePopup({ device, location }) {
             <MapPin className="h-4 w-4 text-green-600" />
           </div>
           <p className="text-gray-700 text-sm">
-            <span className="font-medium">{location.altitude}</span> m
+            <span className="font-medium">
+              {location.altitude ? location.altitude.toFixed(2) : "0.00"} m
+            </span>
           </p>
         </div>
 

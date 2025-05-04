@@ -39,7 +39,10 @@ const DeviceList = ({ devices, onDeviceSelect }) => {
                 <div className="flex items-center gap-2">
                   <Gauge className="h-4 w-4 text-gray-400" />
                   <span className="text-sm font-mono text-gray-900">
-                    {device.location.speed} km/h
+                    {device.location.speed
+                      ? device.location.speed.toFixed(2)
+                      : "0.00"}{" "}
+                    km/h
                   </span>
                 </div>
 
@@ -47,7 +50,10 @@ const DeviceList = ({ devices, onDeviceSelect }) => {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-gray-400" />
                   <span className="text-sm font-mono text-gray-900">
-                    {device.location.altitude || 0} m
+                    {device.location.altitude
+                      ? device.location.altitude.toFixed(2)
+                      : "0.00"}{" "}
+                    m
                   </span>
                 </div>
               </div>
