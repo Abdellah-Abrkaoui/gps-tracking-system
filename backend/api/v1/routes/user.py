@@ -2,7 +2,8 @@ from core.dependencies import (
     admin_only,
     authentication_required,
     verify_access,
-    verify_self_delete_admin,
+    verify_admin_modification_permissions,
+    verify_admin_deletion_permissions,
 )
 from crud.user import (
     create_user,
@@ -67,6 +68,7 @@ def add_user(
 @router.patch(
     "/{user_id}",
     response_model=UserRead,
+    dependencies=[Depends(admin_only), Depends(verify_admin_modification_permissions)],
 )
 def modify_user(
     user_id: int,
@@ -86,7 +88,7 @@ def modify_user(
     response_model=dict,
     dependencies=[
         Depends(admin_only),
-        Depends(verify_self_delete_admin),
+        Depends(verify_admin_deletion_permissions),
     ],
 )
 def delete_user_by_id(
