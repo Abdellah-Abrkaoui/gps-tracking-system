@@ -20,22 +20,22 @@ function VehicleCard() {
         ]);
 
         if (isAdmin) {
-          // If the user is an admin, fetch all devices
           setDevices(allDevices);
         } else {
-          // If the user is a normal user, filter devices based on the linked userId
           const userDevices = allDevices.filter(
             (device) => device.userId === userId
           );
           setDevices(userDevices);
         }
 
-        // Filter the locations based on the devices linked to the current user
-        const userDeviceIds = devices.map((device) => device.id);
+        // Calculate userDeviceIds from the filtered devices
+        const userDeviceIds = isAdmin
+          ? allDevices.map((d) => d.id)
+          : allDevices.filter((d) => d.userId === userId).map((d) => d.id);
+
         const userLocations = allLocations.filter((loc) =>
           userDeviceIds.includes(loc.device_id)
         );
-
         setLocations(userLocations);
       } catch (error) {
         console.error("Error loading dashboard data:", error.message);
@@ -43,7 +43,7 @@ function VehicleCard() {
     };
 
     fetchData();
-  }, [role, userId, devices, isAdmin]); // Add devices to the dependency list
+  }, [role, userId, isAdmin]); // Remove 'devices' from dependencies to avoid infinite loop
 
   const totalVehicles = devices.length;
 
