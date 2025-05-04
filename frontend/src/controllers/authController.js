@@ -7,9 +7,6 @@ export const login = async (username, password, navigate) => {
     if (response.status === 200) {
       const token = response.data.access_token;
       const decoded = jwtDecode(token);
-
-      console.log("Decoded Token: ", decoded);
-
       const isAdmin = decoded.is_admin;
       const role = isAdmin ? "admin" : "user";
 
