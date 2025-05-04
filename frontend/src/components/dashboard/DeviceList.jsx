@@ -27,8 +27,8 @@ const DeviceList = ({ devices, onDeviceSelect }) => {
             >
               {/* Device Header */}
               <div className="flex justify-between items-start">
-                <h3 className="font-semibold text-gray-900 flex gap-1 items-center">
-                  <CarIcon className="h-4 w-4 text-violet-500" />
+                <h3 className="font-mono text-gray-900 flex gap-2 items-center ">
+                  <CarIcon className="h-4 w-4 text-gray-400" />
                   {device.hardware_id}
                 </h3>
               </div>
@@ -36,25 +36,25 @@ const DeviceList = ({ devices, onDeviceSelect }) => {
               {/* Stats Row */}
               <div className="mt-3 flex items-center space-x-4">
                 {/* Speed */}
-                <div className="flex items-center space-x-1">
-                  <Gauge className="h-4 w-4 text-violet-500" />
-                  <span className="text-sm font-medium text-gray-900">
+                <div className="flex items-center gap-2">
+                  <Gauge className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-mono text-gray-900">
                     {device.location.speed} km/h
                   </span>
                 </div>
 
                 {/* Altitude */}
-                <div className="flex items-center space-x-1">
-                  <MapPin className="h-4 w-4 text-violet-500" />
-                  <span className="text-sm font-medium text-gray-900">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-mono text-gray-900">
                     {device.location.altitude || 0} m
                   </span>
                 </div>
               </div>
 
               {/* Last Update */}
-              <div className="mt-2 flex items-center text-xs text-gray-500">
-                <Clock className="h-3 w-3 mr-1 text-violet-500" />
+              <div className="mt-3 flex items-center text-xs text-gray-500 gap-2">
+                <Clock className="h-3 w-3 text-gray-400" />
                 Updated {getTimeSinceUpdate(device.location.timestamp)}
               </div>
             </div>
