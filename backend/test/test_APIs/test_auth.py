@@ -6,7 +6,7 @@ def get_token_admin():
     reponse = requests.post(
         "http://backend:8000/api/v1/auth",
         headers={"accept": "application/json", "Content-Type": "application/json"},
-        json={"username": "admin", "password": "admin"}
+        json={"username": "admin2", "password": "admin"}
     )
     return reponse.json()["access_token"]
 # return the token for the user
@@ -18,7 +18,14 @@ def get_token_user():
     )
     print(reponse.json())
     return reponse.json()["access_token"]
-
+# return the token for the SuperAdmin
+def get_token_SuperAdmin():
+    reponse = requests.post(
+        "http://backend:8000/api/v1/auth",
+        headers={"accept": "application/json", "Content-Type": "application/json"},
+        json={"username": "admin", "password": "admin"}
+    )
+    return reponse.json()["access_token"]   
 
 # Test the authentication endpoint
 def test_auth():
