@@ -1,16 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import DevicePopup from "./dashboard/DevicePopup.jsx";
-import locations from "../assets/data/locations.js";
-import devices from "../assets/data/devices.js";
-import users from "../assets/data/usersDummy.js";
 import L from "leaflet";
+import { getAllDevices } from "../controllers/DevicesController.js";
+import { getAllLocations } from "../controllers/locController.js";
 
 // Default icon fix
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import LoadingSpinner from "./dashboard/LoadingSpinner.jsx";
 
 // Fix default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -131,10 +131,53 @@ const Markers = ({ locations, devices, selectedDevice }) => {
 };
 
 function CarMap({ selectedDevice }) {
-  const currentUser = users[3];
-  const visibleDeviceIds = currentUser.is_admin
+  const [devices, setDevices] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const role = localStorage.getItem("role");
+  const userId = Number(localStorage.getItem("userId"));
+  const isAdmin = role === "admin";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [allDevices, allLocations] = await Promise.all([
+          getAllDevices(),
+          getAllLocations(),
+        ]);
+
+        if (isAdmin) {
+          setDevices(allDevices);
+        } else {
+          const userDevices = allDevices.filter(
+            (device) => device.userId === userId
+          );
+          setDevices(userDevices);
+        }
+
+        setLocations(allLocations);
+      } catch (error) {
+        console.error("Error loading map data:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [isAdmin, userId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  const visibleDeviceIds = isAdmin
     ? devices.map((d) => d.id)
-    : currentUser.devices;
+    : devices.map((d) => d.id);
   const visibleLocations = locations.filter((loc) =>
     visibleDeviceIds.includes(loc.device_id)
   );
