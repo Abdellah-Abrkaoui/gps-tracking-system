@@ -5,14 +5,12 @@ import DevicePopup from "./dashboard/DevicePopup.jsx";
 import L from "leaflet";
 import { getAllDevices } from "../controllers/DevicesController.js";
 import { getAllLocations } from "../controllers/locController.js";
-
-// Default icon fix
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import LoadingSpinner from "./dashboard/LoadingSpinner.jsx";
 
-// Fix default marker icons
+// Fix Leaflet icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -66,7 +64,7 @@ const MapCenter = ({ positions }) => {
       );
       map.fitBounds(bounds, { padding: [40, 40] });
     }
-  }, [positions, map]);
+  }, [positions]);
 
   return null;
 };
@@ -97,7 +95,7 @@ const Markers = ({ locations, devices, selectedDevice }) => {
         }, 300);
       }
     }
-  }, [selectedDevice, locations, map]);
+  }, [selectedDevice]);
 
   return locations
     .filter(
@@ -135,37 +133,45 @@ function CarMap({ selectedDevice }) {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const role = localStorage.getItem("role");
-  const userId = Number(localStorage.getItem("userId"));
-  const isAdmin = role === "admin";
-
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const role = localStorage.getItem("role");
+        const userId = Number(localStorage.getItem("userId"));
+        const isAdmin = role === "admin";
+
         const [allDevices, allLocations] = await Promise.all([
           getAllDevices(),
           getAllLocations(),
         ]);
 
-        if (isAdmin) {
-          setDevices(allDevices);
-        } else {
-          const userDevices = allDevices.filter(
-            (device) => device.userId === userId
-          );
-          setDevices(userDevices);
-        }
+        const filteredDevices = isAdmin
+          ? allDevices
+          : allDevices.filter((device) => device.userId === userId);
+        setDevices(filteredDevices);
 
-        setLocations(allLocations);
+        // ✅ Keep only the latest location per device
+        const latestLocationsMap = new Map();
+        for (const loc of allLocations) {
+          const existing = latestLocationsMap.get(loc.device_id);
+          if (
+            !existing ||
+            new Date(loc.timestamp) > new Date(existing.timestamp)
+          ) {
+            latestLocationsMap.set(loc.device_id, loc);
+          }
+        }
+        const latestLocations = Array.from(latestLocationsMap.values());
+        setLocations(latestLocations);
       } catch (error) {
-        console.error("Error loading map data:", error.message);
+        console.error("❌ Error loading map data:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [isAdmin, userId]);
+  }, []);
 
   if (loading) {
     return (
@@ -175,9 +181,7 @@ function CarMap({ selectedDevice }) {
     );
   }
 
-  const visibleDeviceIds = isAdmin
-    ? devices.map((d) => d.id)
-    : devices.map((d) => d.id);
+  const visibleDeviceIds = devices.map((d) => d.id);
   const visibleLocations = locations.filter((loc) =>
     visibleDeviceIds.includes(loc.device_id)
   );
