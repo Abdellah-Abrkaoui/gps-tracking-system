@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CarMap from "../components/CarMap";
-import VehicleStatsCards from "../components/dashboard/VehicleCard";
 import Sidebar from "../components/dashboard/SideBar";
+import VehicleCard from "../components/dashboard/VehicleCard";
 
 const Dashboard = () => {
   const [selectedDevice, setSelectedDevice] = useState(null);
@@ -15,8 +15,7 @@ const Dashboard = () => {
       {/* Left Main Section */}
       <div className="flex-1 flex flex-col gap-2 overflow-hidden">
         {/* Top Stats Cards */}
-        <VehicleStatsCards />
-
+        <VehicleCard />
         {/* Map - Takes remaining space */}
         <div className="flex-1 min-h-0 bg-white rounded-lg shadow-md">
           <CarMap selectedDevice={selectedDevice} />

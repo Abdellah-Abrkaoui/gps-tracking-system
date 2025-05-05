@@ -43,7 +43,7 @@ def verify_access(
             )
 
 
-def verify_self_delete_admin(
+def verify_admin_modification_permissions(
     session: Session = Depends(get_session),
     user_id: int = Path(...),
     token: str = Depends(oauth2_scheme),
@@ -51,6 +51,36 @@ def verify_self_delete_admin(
     token_data = decode_jwt_token(token)
     current_user_id = token_data["id"]
 
+    # superadmin can modify themselves
+    if current_user_id == 1 and user_id == 1:
+        return
+
+    target_user = get_user_by_id(session, user_id)
+
+    # only superadmin can modify the superadmin
+    if target_user.id == 1 and current_user_id != 1:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Super Admin can modify the superadmin",
+        )
+
+    # only superadmin can modify other admins
+    if target_user.is_admin and current_user_id != 1:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Super Admin can modify admins",
+        )
+
+
+def verify_admin_deletion_permissions(
+    session: Session = Depends(get_session),
+    user_id: int = Path(...),
+    token: str = Depends(oauth2_scheme),
+) -> None:
+    token_data = decode_jwt_token(token)
+    current_user_id = token_data["id"]
+
+    # superadmin can't delete themeselves
     if current_user_id == 1 and user_id == 1:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -59,6 +89,14 @@ def verify_self_delete_admin(
 
     target_user = get_user_by_id(session, user_id)
 
+    # only superadmin can delete other admins
+    if target_user.id == 1 and current_user_id != 1:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Super Admin can delete admins",
+        )
+
+    # only superadmin can delete other admins
     if target_user.is_admin and current_user_id != 1:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

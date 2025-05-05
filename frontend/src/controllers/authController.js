@@ -9,10 +9,13 @@ export const login = async (username, password, navigate) => {
       const decoded = jwtDecode(token);
       const isAdmin = decoded.is_admin;
       const role = isAdmin ? "admin" : "user";
+      const userId = decoded.id;
 
       localStorage.setItem("jwt", token);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("role", role);
+      localStorage.setItem("userId", userId);
+
       setTimeout(() => {
         navigate("/");
       }, 1000);

@@ -1,33 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Car, Clock, Gauge } from "lucide-react";
-import devices from "../../assets/data/locations.js";
-import locations from "../../assets/data/locations.js";
-import users from "../../assets/data/usersDummy.js";
+import { getAllDevices } from "../../controllers/DevicesController.js";
+import { getAllLocations } from "../../controllers/locController.js";
 
 function VehicleCard() {
+  const [devices, setDevices] = useState([]);
+  const [locations, setLocations] = useState([]);
+
   const role = localStorage.getItem("role"); // 'admin' or 'user'
+  const userId = Number(localStorage.getItem("userId"));
   const isAdmin = role === "admin";
 
-  // Pick the first user matching the role
-  const currentUser = users.find((u) =>
-    isAdmin ? u.is_admin === true : u.is_admin === false
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [allDevices, allLocations] = await Promise.all([
+          getAllDevices(),
+          getAllLocations(),
+        ]);
 
-  if (!currentUser) return null;
+        if (isAdmin) {
+          setDevices(allDevices);
+        } else {
+          const userDevices = allDevices.filter(
+            (device) => device.userId === userId
+          );
+          setDevices(userDevices);
+        }
 
-  // Filter devices based on role
-  const userDevices = isAdmin
-    ? devices // Admin sees all devices
-    : devices.filter((device) => currentUser.devices.includes(device.id)); // Normal users see only their assigned devices
+        // Calculate userDeviceIds from the filtered devices
+        const userDeviceIds = isAdmin
+          ? allDevices.map((d) => d.id)
+          : allDevices.filter((d) => d.userId === userId).map((d) => d.id);
 
-  const totalVehicles = userDevices.length;
+        const userLocations = allLocations.filter((loc) =>
+          userDeviceIds.includes(loc.device_id)
+        );
+        setLocations(userLocations);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error.message);
+      }
+    };
 
-  const userDeviceIds = userDevices.map((device) => device.id);
-  const userLocations = locations.filter((loc) =>
-    userDeviceIds.includes(loc.device_id)
-  );
+    fetchData();
+  }, [role, userId, isAdmin]); // Remove 'devices' from dependencies to avoid infinite loop
 
-  const speeds = userLocations
+  const totalVehicles = devices.length;
+
+  const speeds = locations
     .map((loc) => loc.speed)
     .filter((speed) => typeof speed === "number");
 
@@ -37,10 +57,10 @@ function VehicleCard() {
       : 0;
 
   const mostRecentUpdate =
-    userLocations.length > 0
+    locations.length > 0
       ? new Date(
           Math.max(
-            ...userLocations.map((loc) => new Date(loc.received_at).getTime())
+            ...locations.map((loc) => new Date(loc.received_at).getTime())
           )
         )
       : new Date();

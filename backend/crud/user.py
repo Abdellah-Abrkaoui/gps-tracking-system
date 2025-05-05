@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from fastapi import HTTPException, status
 
@@ -18,65 +18,89 @@ def get_users(session: Session) -> list[User]:
     return session.query(User).all()
 
 
-def create_user(session: Session, user: UserCreate) -> UserRead | None:
+def create_user(session: Session, user_data: UserCreate) -> UserRead:
     from core.security import get_password_hash
 
-    hashed_password = get_password_hash(user.password)
+    user = User(
+        username=user_data.username,
+        password=get_password_hash(user_data.password),
+        is_admin=user_data.is_admin,
+    )
+    session.add(user)
 
-    db_user = User(
+    device_ids = user_data.devices or []
+
+    if device_ids:
+        devices = session.exec(select(Device).where(Device.id.in_(device_ids))).all()
+
+        found_ids = {device.id for device in devices}
+        missing_ids = set(device_ids) - found_ids
+
+        if missing_ids:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Devices not found: {missing_ids}",
+            )
+
+        session.add_all(
+            [UserDeviceLink(user=user, device_id=device_id) for device_id in device_ids]
+        )
+
+    session.commit()
+    session.refresh(user)
+
+    return UserRead(
+        id=user.id,
         username=user.username,
-        password=hashed_password,
         is_admin=user.is_admin,
-        devices=user.devices,
+        devices=device_ids,
     )
 
-    session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
 
-    return UserRead.from_orm(db_user)
-
-
-def update_user(session: Session, user: User, user_update_data: UserModify) -> User:
+def update_user(session: Session, user: User, update_data: UserModify) -> UserRead:
     from core.security import get_password_hash
 
-    if user_update_data.password:
-        user_update_data.password = get_password_hash(user_update_data.password)
+    if update_data.password:
+        update_data.password = get_password_hash(update_data.password)
 
-    user_data = user_update_data.model_dump(exclude_unset=True)
-
+    user_data = update_data.model_dump(exclude_unset=True, exclude={"devices"})
     user.sqlmodel_update(user_data)
 
-    # handle device updates
-    if user_update_data.devices is not None:
-        # first clear the existing user-device links
-        existing_device_links = (
-            session.query(UserDeviceLink)
-            .filter(UserDeviceLink.user_id == user.id)
-            .all()
-        )
-        for link in existing_device_links:
+    if update_data.devices is not None:
+        device_ids = update_data.devices
+
+        devices = session.exec(select(Device).where(Device.id.in_(device_ids))).all()
+        found_ids = {device.id for device in devices}
+        missing_ids = set(device_ids) - found_ids
+
+        if missing_ids:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Devices not found: {sorted(missing_ids)}",
+            )
+
+        existing_links = session.exec(
+            select(UserDeviceLink).where(UserDeviceLink.user_id == user.id)
+        ).all()
+        for link in existing_links:
             session.delete(link)
 
-        # now we add the new device links based on the provided device IDs
-        for device_id in user_update_data.devices:
-            # check if the device exists
-            device = session.query(Device).filter(Device.id == device_id).first()
-            if not device:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Device with id {device_id} not found.",
-                )
-
-            # create and add a new UserDeviceLink entry
-            new_link = UserDeviceLink(user_id=user.id, device_id=device_id)
-            session.add(new_link)
+        new_links = [
+            UserDeviceLink(user_id=user.id, device_id=device_id)
+            for device_id in device_ids
+        ]
+        session.add_all(new_links)
 
     session.add(user)
     session.commit()
     session.refresh(user)
 
-    return user
+    return UserRead(
+        id=user.id,
+        username=user.username,
+        is_admin=user.is_admin,
+        devices=update_data.devices or [],
+    )
 
 
 def delete_user(session: Session, user: User) -> dict:

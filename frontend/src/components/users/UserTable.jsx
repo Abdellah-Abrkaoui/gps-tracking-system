@@ -17,6 +17,9 @@ const UserTable = ({
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
+  // Function to check if user is the protected admin (id === 1)
+  const isProtectedAdmin = (userId) => userId === 1;
+
   return (
     <>
       <div className="w-full overflow-hidden bg-white rounded-lg shadow-md mt-6">
@@ -121,22 +124,24 @@ const UserTable = ({
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => onEdit(user)}
-                          className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50"
-                          title="Edit user"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => onDelete(user.id)}
-                          className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50"
-                          title="Delete user"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
+                      {!isProtectedAdmin(user.id) && (
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => onEdit(user)}
+                            className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50"
+                            title="Edit user"
+                          >
+                            <Edit className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => onDelete(user.id)}
+                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50"
+                            title="Delete user"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -168,22 +173,24 @@ const UserTable = ({
                         <h3 className="text-sm font-medium text-gray-900">
                           {user.username}
                         </h3>
-                        <div className="flex space-x-2 ml-2">
-                          <button
-                            onClick={() => onEdit(user)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50"
-                            title="Edit user"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => onDelete(user.id)}
-                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50"
-                            title="Delete user"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
+                        {!isProtectedAdmin(user.id) && (
+                          <div className="flex space-x-2 ml-2">
+                            <button
+                              onClick={() => onEdit(user)}
+                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50"
+                              title="Edit user"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => onDelete(user.id)}
+                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50"
+                              title="Delete user"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
                         <span className="font-medium">ID:</span> {user.id}

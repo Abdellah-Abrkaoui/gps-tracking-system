@@ -1,14 +1,47 @@
-// src/components/Sidebar.jsx
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Search, Filter } from "lucide-react";
-import devices from "../../assets/data/devices";
-import locations from "../../assets/data/locations";
+import { getAllDevices } from "../../controllers/DevicesController.js";
+import { getAllLocations } from "../../controllers/locController.js";
 import DeviceList from "./DeviceList";
 
 const Sidebar = ({ onDeviceSelect }) => {
+  const [devices, setDevices] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [search, setSearch] = useState("");
   const [minSpeed, setMinSpeed] = useState(0);
   const [maxSpeed, setMaxSpeed] = useState(140);
+
+  const role = localStorage.getItem("role"); // 'admin' or 'user'
+  const userId = Number(localStorage.getItem("userId")); // Get the logged-in user's ID
+  const isAdmin = role === "admin";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [allDevices, allLocations] = await Promise.all([
+          getAllDevices(),
+          getAllLocations(),
+        ]);
+
+        if (isAdmin) {
+          // If the user is an admin, fetch all devices
+          setDevices(allDevices);
+        } else {
+          // If the user is a normal user, filter devices based on the logged-in userId
+          const userDevices = allDevices.filter(
+            (device) => device.userId === userId
+          );
+          setDevices(userDevices);
+        }
+
+        setLocations(allLocations);
+      } catch (error) {
+        console.error("Error loading sidebar data:", error.message);
+      }
+    };
+
+    fetchData();
+  }, [role, userId, isAdmin]);
 
   // Merge devices with their latest location
   const mergedData = useMemo(() => {
@@ -19,9 +52,9 @@ const Sidebar = ({ onDeviceSelect }) => {
         location: loc || { speed: 0, altitude: 0, timestamp: null },
       };
     });
-  }, []);
+  }, [devices, locations]);
 
-  // Filter by search and speed
+  // Filter devices based on search and speed range
   const filtered = mergedData.filter((device) => {
     const matchSearch = device.hardware_id
       .toLowerCase()
