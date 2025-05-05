@@ -65,11 +65,14 @@ const Users = () => {
 
   const handleAddUser = async () => {
     try {
-      await userController.createUser(newUser);
+      console.log("Sending to backend:", newUser);
+      const createdUser = await userController.createUser(newUser);
+      console.log("Created user with devices:", createdUser); // Add this line
+
       setShowAddModal(false);
       setNewUser({ username: "", password: "", is_admin: false, devices: [] });
       await fetchUsers();
-   }catch (error) {
+    } catch (error) {
       setError(error.message || "Failed to add user");
       console.error("Error adding user:", error);
     }

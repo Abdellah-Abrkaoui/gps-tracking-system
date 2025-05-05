@@ -6,7 +6,6 @@ import DeviceDetails from "../components/devices/DeviceDetails";
 import deviceController from "../controllers/DevicesController";
 import { useState, useEffect } from "react";
 
-
 function Devices() {
   const [allDevices, setAllDevices] = useState([]); // Remplace dummyDevices par tableau vide
   const [devices, setDevices] = useState([]); // Idem
@@ -36,14 +35,13 @@ function Devices() {
     fetchDevices();
   }, []);
 
-   const fetchDevices = async () => {
+  const fetchDevices = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const devicesData = await deviceController.getAllDevices();
-      console.log("Données reçues:", devicesData); // Check data 
       setDevices(devicesData);
-      setAllDevices(devicesData)
+      setAllDevices(devicesData);
     } catch (err) {
       console.error("Erreur complète:", err); // Log error
       setError(err.message || "Failed to load devices");
@@ -51,7 +49,6 @@ function Devices() {
       setIsLoading(false);
     }
   };
-  
 
   const resetForm = () => {
     setFormData({
@@ -60,9 +57,6 @@ function Devices() {
       createdAt: "",
     });
   };
-
-
-  
 
   const handleAddDevice = () => {
     setCurrentDevice(null);
@@ -96,7 +90,7 @@ function Devices() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-  
+
     try {
       // Formatage des données pour l'API
       const devicedata = {
@@ -104,41 +98,40 @@ function Devices() {
         // Si API attend une date specifique
         created_at: formData.createdAt || new Date().toISOString(),
       };
-  
+
       if (isEditing) {
         await deviceController.updateDevice(currentDevice.id, devicedata);
       } else {
         await deviceController.createDevice(devicedata);
       }
-  
-      
     } catch (err) {
       console.error("Operation failed:", err);
-      setError(err.response?.data?.message || err.message || "Operation failed");
+      setError(
+        err.response?.data?.message || err.message || "Operation failed"
+      );
     } finally {
       setIsLoading(false);
       setIsModalOpen(false);
       resetForm();
       await fetchDevices();
-        }
+    }
   };
 
-    const handleDeleteDevice = async (deviceId) => {
-      if (!window.confirm("Are you sure you want to delete this device?")) return;
-      try {
-        await deviceController.deleteDevice(deviceId);
-        setAllDevices(allDevices.filter((device) => device.id !== deviceId));
-        setDevices(devices.filter((device) => device.id !== deviceId));
-        if (currentDevices.length === 1 && currentPage > 1) {
-          setCurrentPage(currentPage - 1);
-        }
-      } catch (error) {
-        // Gestion des erreurs
-        setError(error.message || "Failed to delete device");
-        console.error("Error deleting device:", error);
+  const handleDeleteDevice = async (deviceId) => {
+    if (!window.confirm("Are you sure you want to delete this device?")) return;
+    try {
+      await deviceController.deleteDevice(deviceId);
+      setAllDevices(allDevices.filter((device) => device.id !== deviceId));
+      setDevices(devices.filter((device) => device.id !== deviceId));
+      if (currentDevices.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
       }
-    };
-    
+    } catch (error) {
+      // Gestion des erreurs
+      setError(error.message || "Failed to delete device");
+      console.error("Error deleting device:", error);
+    }
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
