@@ -14,10 +14,6 @@ const Dashboard = () => {
   const [minSpeed, setMinSpeed] = useState(0);
   const [maxSpeed, setMaxSpeed] = useState(140);
 
-  const role = localStorage.getItem("role");
-  const userId = Number(localStorage.getItem("userId"));
-  const isAdmin = role === "admin";
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,18 +22,12 @@ const Dashboard = () => {
           getAllLocations(),
         ]);
 
-        const filteredDevices = isAdmin
-          ? allDevices
-          : allDevices.filter((device) => device.userId === userId);
-        setDevices(filteredDevices);
+        setDevices(allDevices);
 
-        const userDeviceIds = filteredDevices.map((d) => d.id);
         // Keep only latest location per device
         const latestLocationMap = new Map();
 
         for (const loc of allLocations) {
-          if (!userDeviceIds.includes(loc.device_id)) continue;
-
           const existing = latestLocationMap.get(loc.device_id);
           if (
             !existing ||
@@ -54,7 +44,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [role, userId, isAdmin]);
+  }, []);
 
   const mergedData = useMemo(() => {
     return devices.map((device) => {
