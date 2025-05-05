@@ -1,16 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import DevicePopup from "./dashboard/DevicePopup.jsx";
 import L from "leaflet";
-import { getAllDevices } from "../controllers/DevicesController.js";
-import { getAllLocations } from "../controllers/locController.js";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import LoadingSpinner from "./dashboard/LoadingSpinner.jsx";
 
-// Fix Leaflet icon
+// Fix Leaflet icon defaults
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -128,59 +125,7 @@ const Markers = ({ locations, devices, selectedDevice }) => {
     });
 };
 
-function CarMap({ selectedDevice }) {
-  const [devices, setDevices] = useState([]);
-  const [locations, setLocations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const role = localStorage.getItem("role");
-        const userId = Number(localStorage.getItem("userId"));
-        const isAdmin = role === "admin";
-
-        const [allDevices, allLocations] = await Promise.all([
-          getAllDevices(),
-          getAllLocations(),
-        ]);
-
-        const filteredDevices = isAdmin
-          ? allDevices
-          : allDevices.filter((device) => device.userId === userId);
-        setDevices(filteredDevices);
-
-        // ✅ Keep only the latest location per device
-        const latestLocationsMap = new Map();
-        for (const loc of allLocations) {
-          const existing = latestLocationsMap.get(loc.device_id);
-          if (
-            !existing ||
-            new Date(loc.timestamp) > new Date(existing.timestamp)
-          ) {
-            latestLocationsMap.set(loc.device_id, loc);
-          }
-        }
-        const latestLocations = Array.from(latestLocationsMap.values());
-        setLocations(latestLocations);
-      } catch (error) {
-        console.error("❌ Error loading map data:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
+function CarMap({ devices, locations, selectedDevice }) {
   const visibleDeviceIds = devices.map((d) => d.id);
   const visibleLocations = locations.filter((loc) =>
     visibleDeviceIds.includes(loc.device_id)
