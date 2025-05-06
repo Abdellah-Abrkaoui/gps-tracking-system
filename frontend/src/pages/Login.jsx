@@ -3,7 +3,8 @@ import { DirectionsCar as CarIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { login } from "../controllers/authController"; // Import the login function
+import { login } from "../controllers/authController";
+import loginThumbnail from "../assets/images/login-thumbnails.png"; // Import your image
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -37,9 +38,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-400">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-400">
+      {/* Background thumbnail image */}
+      <img
+        src={loginThumbnail}
+        alt="Login Thumbnail"
+        className="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none"
+      />
+
+      {/* Content overlay */}
       <ToastContainer />
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="relative z-10 bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-4">
           <CarIcon className="text-blue-600" style={{ fontSize: "48px" }} />
         </div>
