@@ -1,50 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Car, Clock, Gauge } from "lucide-react";
-import { getAllDevices } from "../../controllers/DevicesController.js";
-import { getAllLocations } from "../../controllers/locController.js";
 
-function VehicleCard() {
-  const [devices, setDevices] = useState([]);
-  const [locations, setLocations] = useState([]);
-
-  const role = localStorage.getItem("role"); // 'admin' or 'user'
-  const userId = Number(localStorage.getItem("userId"));
-  const isAdmin = role === "admin";
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [allDevices, allLocations] = await Promise.all([
-          getAllDevices(),
-          getAllLocations(),
-        ]);
-
-        if (isAdmin) {
-          setDevices(allDevices);
-        } else {
-          const userDevices = allDevices.filter(
-            (device) => device.userId === userId
-          );
-          setDevices(userDevices);
-        }
-
-        // Calculate userDeviceIds from the filtered devices
-        const userDeviceIds = isAdmin
-          ? allDevices.map((d) => d.id)
-          : allDevices.filter((d) => d.userId === userId).map((d) => d.id);
-
-        const userLocations = allLocations.filter((loc) =>
-          userDeviceIds.includes(loc.device_id)
-        );
-        setLocations(userLocations);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error.message);
-      }
-    };
-
-    fetchData();
-  }, [role, userId, isAdmin]); // Remove 'devices' from dependencies to avoid infinite loop
-
+function VehicleCard({ devices, locations }) {
   const totalVehicles = devices.length;
 
   const speeds = locations

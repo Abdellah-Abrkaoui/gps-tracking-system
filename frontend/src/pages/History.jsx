@@ -1,117 +1,97 @@
-
-import React, {useEffect, useState } from "react";
+import licensePlateController from "../controllers/licensePlateController";
+import locController from "../controllers/locController";
+import React, { useEffect, useState } from "react";
 import VehicleDashboard from "../components/HistoryComponents/VehicleDashboard";
 
-
-
 const History = () => {
-  const [vehicles, setvehicles] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  
-  useEffect(() => {
+  const [vehicles, setVehicles] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
 
-    setIsLoading(true);
-    // #TODO : FETCH DATA FROM BACKEND
-    
-    setvehicles(mockVehicles);
-    setIsLoading(false);
-   
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const data = await licensePlateController.getAlllicenseplate();
+
+        const vehiclesWithLocation = await Promise.all(
+          data.map(async (vehicle) => {
+            if (!vehicle.device_id) {
+              console.warn("Missing device_id in vehicle:", vehicle);
+              return null;
+            }
+
+            try {
+              const locationData = await locController.getLocationByDeviceId(vehicle.device_id);
+              return { ...vehicle, locationData };
+            } catch (locationError) {
+              console.warn(`No location for device_id ${vehicle.device_id}`);
+              return null;
+            }
+          })
+        );
+
+        const validVehicles = vehiclesWithLocation.filter(v => v && v.locationData);
+
+        setVehicles(validVehicles);
+
+        if (validVehicles.length > 0) {
+          const updates = validVehicles.map(v => new Date(v.locationData.timestamp));
+          const latestUpdate = new Date(Math.max(...updates));
+          setLastUpdate(latestUpdate);
+        } else {
+          setLastUpdate(null);
+        }
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(err.message || "Failed to load vehicle data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVehicles();
+    const interval = setInterval(fetchVehicles, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
-  , []);
+
+  if (error) {
+    return (
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <strong>Error:</strong> {error}
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="container mx-auto p-4">
-        <VehicleDashboard vehicles={mockVehicles} />
-      </div>
+    <div className="container mx-auto p-4">
+      {lastUpdate && (
+        <div className="text-sm text-gray-500 mb-4">
+          Last updated: {lastUpdate.toLocaleString()}
+        </div>
+      )}
+
+      {vehicles.length > 0 ? (
+        <VehicleDashboard vehicles={vehicles} />
+      ) : (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+          No vehicles with location data available
+        </div>
+      )}
     </div>
-  )
-}
-
-export default History
-
-// #TODO : REMOVE THIS MOCK DATA AND USE THE API TO FETCH DATA
-
-// generatPath function to create a path between two points addiha f controller
-const generatePath = (startLat, startLng, endLat, endLng, points) => {
-  const path = [];
-  const startTime = Date.now() - points * 60000; // One point per minute
-
-  for (let i = 0; i < points; i++) {
-    const ratio = i / (points - 1);
-    const lat = startLat + (endLat - startLat) * ratio + (Math.random() - 0.5) * 0.005;
-    const lng = startLng + (endLng - startLng) * ratio + (Math.random() - 0.5) * 0.005;
-    path.push({
-      latitude: lat,
-      longitude: lng,
-      timestamp: startTime + i * 60000
-    });
-  }
-  return path;
+  );
 };
 
-// Helper function to generate speed data
-const generateSpeedData = (points) => {
-  const data = [];
-  const startTime = Date.now() - points * 60000;
-  let lastSpeed = 30 + Math.random() * 30;
-
-  for (let i = 0; i < points; i++) {
-    const changeAmount = (Math.random() - 0.5) * 10;
-    lastSpeed = Math.max(5, Math.min(130, lastSpeed + changeAmount));
-
-    data.push({
-      timestamp: startTime + i * 60000,
-      speed: Math.round(lastSpeed)
-    });
-  }
-  return data;
-};
-
-const mockVehicles = [
-  {
-    id: "v1",
-    name: "Tesla Model 3",
-    model: "Model 3",
-    year: 2023,
-    licensePlate: "EV-123",
-    speedData: generateSpeedData(30),
-    locationHistory: generatePath(37.7749, -122.4194, 37.8044, -122.2711, 30) // SF to Berkeley
-  },
-  {
-    id: "v2",
-    name: "Toyota Camry",
-    model: "Camry",
-    year: 2022,
-    licensePlate: "TCY-456",
-    speedData: generateSpeedData(25),
-    locationHistory: generatePath(34.0522, -118.2437, 34.1478, -118.1445, 25) // LA to Pasadena
-  },
-  {
-    id: "v3",
-    name: "Ford F-150",
-    model: "F-150",
-    year: 2021,
-    licensePlate: "FFT-789",
-    speedData: generateSpeedData(35),
-    locationHistory: generatePath(40.7128, -74.0060, 40.7831, -73.9712, 35) // NYC to Central Park
-  },
-  {
-    id: "v4",
-    name: "Honda Civic",
-    model: "Civic",
-    year: 2023,
-    licensePlate: "HC-101",
-    speedData: generateSpeedData(28),
-    locationHistory: generatePath(41.8781, -87.6298, 42.0451, -87.6877, 28) // Chicago to Evanston
-  },
-  {
-    id: "v5",
-    name: "BMW X5",
-    model: "X5",
-    year: 2022,
-    licensePlate: "BMX-555",
-    speedData: generateSpeedData(32),
-    locationHistory: generatePath(33.7490, -84.3880, 33.9526, -84.5499, 32) // Atlanta to Marietta
-  }
-];
+export default History;
