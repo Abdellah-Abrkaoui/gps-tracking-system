@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import { Icon } from 'leaflet';
-import { MapPin } from 'lucide-react';
 
 const VehicleMap = ({ locationHistory, vehicleName, className = '' }) => {
   const [positions, setPositions] = useState([]);
@@ -13,8 +11,7 @@ const VehicleMap = ({ locationHistory, vehicleName, className = '' }) => {
       const newPositions = locationHistory.map(loc => [loc.latitude, loc.longitude]);
       setPositions(newPositions);
 
-      const midIndex = Math.floor(locationHistory.length / 2);
-      setCenter([locationHistory[midIndex].latitude, locationHistory[midIndex].longitude]);
+      setCenter([locationHistory[0].latitude, locationHistory[0].longitude]);
 
       if (locationHistory.length > 1) {
         const latDiff = Math.abs(

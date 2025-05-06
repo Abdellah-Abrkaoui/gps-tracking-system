@@ -33,7 +33,7 @@ const VehicleDashboard = ({ vehicles }) => {
 
     const startTime = new Date(selectedVehicle.locationHistory[0].timestamp);
     const endTime = new Date(selectedVehicle.locationHistory[selectedVehicle.locationHistory.length - 1].timestamp);
-    const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60); // in minutes
+    const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60); // in minutes
 
     return {
       avgSpeed: Math.round(avgSpeed),
@@ -74,8 +74,7 @@ const VehicleDashboard = ({ vehicles }) => {
                   <Car className="h-8 w-8 text-blue-800" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{selectedVehicle.name}</h2>
-                  <p className="text-gray-600">{selectedVehicle.year} · {selectedVehicle.model} · {selectedVehicle.licensePlate}</p>
+                  <p className="text-black font-bold">{selectedVehicle.licensePlate}</p>
                 </div>
               </div>
               
@@ -86,7 +85,7 @@ const VehicleDashboard = ({ vehicles }) => {
                       <Clock className="h-4 w-4 text-gray-500 mr-1" />
                       <span className="text-xs text-gray-500">Duration</span>
                     </div>
-                    <p className="text-lg font-semibold">{stats.duration} mins</p>
+                    <p className="text-lg font-semibold">{stats.duration} hours</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-md">
                     <div className="flex items-center mb-1">
@@ -100,8 +99,8 @@ const VehicleDashboard = ({ vehicles }) => {
                       <Gauge className="h-4 w-4 text-gray-500 mr-1" />
                       <span className="text-xs text-gray-500">Max Speed</span>
                     </div>
-                    <p className="text-lg font-semibold">{stats.maxSpeed} km/h</p>
-                  </div>
+                    <p className="text-lg font-semibold">{stats.maxSpeed.toFixed(2)} km/h</p>
+                    </div>
                   <div className="bg-gray-50 p-3 rounded-md">
                     <div className="flex items-center mb-1">
                       <MapPin className="h-4 w-4 text-gray-500 mr-1" />
@@ -119,7 +118,7 @@ const VehicleDashboard = ({ vehicles }) => {
             <SpeedGraph data={selectedVehicle.speedData} />
             <VehicleMap 
               locationHistory={selectedVehicle.locationHistory} 
-              vehicleName={selectedVehicle.name} 
+              vehicleName={selectedVehicle.licensePlate} 
             />
           </div>
 

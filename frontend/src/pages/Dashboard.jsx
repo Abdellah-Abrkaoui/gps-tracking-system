@@ -47,13 +47,17 @@ const Dashboard = () => {
   }, []);
 
   const mergedData = useMemo(() => {
-    return devices.map((device) => {
-      const loc = locations.find((l) => l.device_id === device.id);
-      return {
-        ...device,
-        location: loc || { speed: 0 },
-      };
-    });
+    return devices
+      .map((device) => {
+        const loc = locations.find((l) => l.device_id === device.id);
+        // Only include device if it has a location
+        if (!loc) return null;
+        return {
+          ...device,
+          location: loc,
+        };
+      })
+      .filter((device) => device !== null); // Filter out devices without locations
   }, [devices, locations]);
 
   const filteredDevices = mergedData.filter((device) => {

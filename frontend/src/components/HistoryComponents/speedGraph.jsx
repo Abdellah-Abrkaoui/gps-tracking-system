@@ -39,16 +39,16 @@ const SpeedGraph = ({ data, className = '' }) => {
               tick={{ fontSize: 12 }}
               tickMargin={10}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#fff', 
-                border: 'none', 
-                borderRadius: '0.375rem', 
-                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-              }}
-              formatter={(value) => [`${value} km/h`, 'Speed']}
-              labelFormatter={(time) => `Time: ${time}`}
-            />
+           <Tooltip 
+  contentStyle={{ 
+    backgroundColor: '#fff', 
+    border: 'none', 
+    borderRadius: '0.375rem', 
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+  }}
+  formatter={(value) => [`${Number(value).toFixed(2)} km/h`, 'Speed']}
+  labelFormatter={(time) => `Time: ${time}`}
+/>
             <Legend />
             <Line
               type="monotone"

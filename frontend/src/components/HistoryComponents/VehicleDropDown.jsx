@@ -5,6 +5,14 @@ const VehicleDropdown = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Select first vehicle as default if not selected
+  useEffect(() => {
+    if (!selectedVehicle && vehicles.length > 0) {
+      onSelectVehicle(vehicles[0]);
+    }
+  }, [vehicles, selectedVehicle, onSelectVehicle]);
+
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -13,9 +21,7 @@ const VehicleDropdown = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSelect = (vehicle) => {
@@ -32,7 +38,7 @@ const VehicleDropdown = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
         <div className="flex items-center">
           <Car className="mr-2 h-5 w-5 text-blue-800" />
           <span className="font-medium">
-            {selectedVehicle ? selectedVehicle.name : 'Select a vehicle'}
+            {selectedVehicle ? selectedVehicle.licensePlate : 'Select a vehicle'}
           </span>
         </div>
         <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -50,11 +56,10 @@ const VehicleDropdown = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
                 onClick={() => handleSelect(vehicle)}
               >
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">{vehicle.name}</span>
-                  <span className="text-sm text-gray-500">{vehicle.licensePlate}</span>
+                  <span className="font-medium">{vehicle.licensePlate}</span>
                 </div>
                 <div className="text-xs text-gray-500">
-                  {vehicle.year} · {vehicle.model}
+                {vehicle.year ? new Date(vehicle.year).toLocaleDateString() : 'Unknown year'}
                 </div>
               </li>
             ))}
