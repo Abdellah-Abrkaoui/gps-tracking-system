@@ -6,13 +6,9 @@ const licensePlateController = {
       const response = await axiosInstance.get("/license-plate-history");
       return response.data;
     } catch (error) {
-      console.error(
-        "Error fetching all license plate:",
-        error.response?.data?.detail
-      );
+      console.error("Error fetching all license plate:",error.response?.data?.detail);
       throw new Error(
-        error.response?.data?.detail || "Failed to fetch license palte"
-      );
+        error.response?.data?.detail || "Failed to fetch license palte");
     }
   },
 
@@ -21,13 +17,8 @@ const licensePlateController = {
       const response = await axiosInstance.get(`/license-plate-history/${device_id}`);
       return response.data;
     } catch (error) {
-      console.error(
-        `Error fetching license palte with ID ${device_id}:`,
-        error.response?.data?.detail
-      );
-      throw new Error(
-        error.response?.data?.detail || "Failed to fetch license palte"
-      );
+      console.error("Error fetching license palte with ID ${device_id}:",error.response?.data?.detail);
+      throw new Error(error.response?.data?.detail || "Failed to fetch license palte");
     }
   },
 };

@@ -1,94 +1,92 @@
-import licensePlateController from "../controllers/licensePlateController";
-import locController from "../controllers/locController";
 import React, { useEffect, useState } from "react";
 import VehicleDashboard from "../components/HistoryComponents/VehicleDashboard";
+import deviceController from "../controllers/DevicesController";
+import locController from "../controllers/locController";
+import licensePlateController from "../controllers/licensePlateController";
 
 const History = () => {
+  const userId = localStorage.getItem("userId");
   const [vehicles, setVehicles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [lastUpdate, setLastUpdate] = useState(null);
 
   useEffect(() => {
-    const fetchVehicles = async () => {
+    const fetchData = async () => {
+      if (!userId) return;
+
       setIsLoading(true);
-      setError(null);
 
       try {
-        const data = await licensePlateController.getAlllicenseplate();
+        const [devices, licensePlates, allLocations] = await Promise.all([
+          deviceController.getAllDevices(),
+          licensePlateController.getAlllicenseplate(),
+          locController.getAllLocations()
+        ]);
 
-        const vehiclesWithLocation = await Promise.all(
-          data.map(async (vehicle) => {
-            if (!vehicle.device_id) {
-              console.warn("Missing device_id in vehicle:", vehicle);
-              return null;
-            }
-
-            try {
-              const locationData = await locController.getLocationByDeviceId(vehicle.device_id);
-              return { ...vehicle, locationData };
-            } catch (locationError) {
-              console.warn(`No location for device_id ${vehicle.device_id}`);
-              return null;
-            }
-          })
-        );
-
-        const validVehicles = vehiclesWithLocation.filter(v => v && v.locationData);
-
-        setVehicles(validVehicles);
-
-        if (validVehicles.length > 0) {
-          const updates = validVehicles.map(v => new Date(v.locationData.timestamp));
-          const latestUpdate = new Date(Math.max(...updates));
-          setLastUpdate(latestUpdate);
-        } else {
-          setLastUpdate(null);
+        const latestLocationMap = new Map();
+        for (const loc of allLocations) {
+          const existing = latestLocationMap.get(loc.device_id);
+          if (!existing || new Date(loc.timestamp) > new Date(existing.timestamp)) {
+            latestLocationMap.set(loc.device_id, loc);
+          }
         }
 
+        const latestLicensePlateMap = new Map();
+        for (const lp of licensePlates) {
+          const existing = latestLicensePlateMap.get(lp.device_id);
+          if (!existing || new Date(lp.created_at) > new Date(existing.created_at)) {
+            latestLicensePlateMap.set(lp.device_id, lp);
+          }
+        }
+
+        const assembledVehicles = devices.map(device => {
+          const plate = latestLicensePlateMap.get(device.id);
+          const location = latestLocationMap.get(device.id);
+
+          if (!plate || !location) {
+            return null; // Skip vehicles without license plates or locations
+          }
+
+          const locationHistory = allLocations
+            .filter(loc => loc.device_id === device.id)
+            .map(loc => ({
+              latitude: loc.latitude,
+              longitude: loc.longtitude,
+              timestamp: new Date(loc.timestamp).getTime(),
+              speed: loc.speed ?? 0
+            }));
+
+          const speedData = locationHistory.map(loc => ({
+            timestamp: loc.timestamp,
+            speed: loc.speed
+          }));
+
+          return {
+            id: device.id,
+            year: plate?.start_date || "N/A",
+            licensePlate: plate?.license_plate || "Unknown",
+            lastLocation: location || null,
+            locationHistory,
+            speedData
+          };
+        }).filter(vehicle => vehicle !== null); // Filter out any null values
+
+        setVehicles(assembledVehicles);
       } catch (err) {
-        console.error("Fetch error:", err);
-        setError(err.message || "Failed to load vehicle data");
+        console.error("Failed to fetch data", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchVehicles();
-    const interval = setInterval(fetchVehicles, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <strong>Error:</strong> {error}
-      </div>
-    );
-  }
+    fetchData();
+  }, [userId]);
 
   return (
     <div className="container mx-auto p-4">
-      {lastUpdate && (
-        <div className="text-sm text-gray-500 mb-4">
-          Last updated: {lastUpdate.toLocaleString()}
-        </div>
-      )}
-
-      {vehicles.length > 0 ? (
-        <VehicleDashboard vehicles={vehicles} />
+      {isLoading ? (
+        <div className="text-center py-10">Loading...</div>
       ) : (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-          No vehicles with location data available
-        </div>
+        <VehicleDashboard vehicles={vehicles} />
       )}
     </div>
   );

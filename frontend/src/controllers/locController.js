@@ -1,6 +1,6 @@
 import axiosInstance from "../controllers/axiosController";
 
-const locationController = {
+const locController = {
   getAllLocations: async () => {
     try {
       const response = await axiosInstance.get("/locations");
@@ -11,30 +11,10 @@ const locationController = {
     }
   },
 
-  getLocationById: async (locationId) => {
-    try {
-      const response = await axiosInstance.get(`/locations/${locationId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching location with ID ${locationId}:`, error.response?.data?.detail);
-      throw new Error(error.response?.data?.detail || "Failed to fetch location");
-    }
-  },
-  getLocationByDeviceId: async (deviceId) => {
-    try {
-      const response = await axiosInstance.get(`/locations/${deviceId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching location with device ID ${deviceId}:`, error.response?.data?.detail);
-      throw new Error(error.response?.data?.detail || "Failed to fetch location");
-    }
-   
-  }
+  
+ 
 };
 
-export default locationController;
+export default locController;
 
-// Optional named exports
-export const getAllLocations = locationController.getAllLocations;
-export const getLocationById = locationController.getLocationById;
-export const getLocationByDeviceId = locationController.getLocationByDeviceId;
+export const getAllLocations = locController.getAllLocations;
