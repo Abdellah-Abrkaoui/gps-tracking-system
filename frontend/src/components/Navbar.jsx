@@ -50,15 +50,12 @@ const Navbar = () => {
         </a>
       </div>
 
-      {/* Middle - hidden on mobile */}
-      <div className="hidden md:block text-lg font-medium">
-        GPS Cars Tracking Systems
-      </div>
-
       {/* Right side */}
       <div className="flex items-center gap-4">
-        <span className="text-sm italic">{formattedDate}</span>
-        <span className="text-sm font-bold">{formattedTime}</span>
+        <div className="hidden md:flex items-center gap-2">
+          <span className="text-sm italic">{formattedDate}</span>
+          <span className="text-sm font-bold">{formattedTime}</span>
+        </div>
 
         {/* Profile dropdown */}
         <div className="relative">
@@ -75,13 +72,6 @@ const Navbar = () => {
               className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
               onMouseLeave={closeDropdown}
             >
-              <a
-                href="/"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
-              >
-                <SettingsIcon className="mr-2" fontSize="small" />
-                Settings
-              </a>
               <button
                 onClick={handleLogout}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
