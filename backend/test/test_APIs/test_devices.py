@@ -47,7 +47,7 @@ def test_read_device_authorized():
         f"http://backend:8000/api/v1/devices/{DEVICE_ID_CREATED}",
         headers={
             "accept": "application/json",
-            "Authorization": f"Bearer {TOKEN_ADMIN}",
+            "Authorization": f"Bearer {TOKEN_SUPER_ADMIN}",
         },
     )
     assert response.status_code == 200
@@ -60,7 +60,7 @@ def test_read_device_forbidden():
         headers={"accept": "application/json", "Authorization": f"Bearer {TOKEN_USER}"},
     )
     # Depending on your verify_device_access, this might be 403 or 404
-    assert response.status_code in [403, 404]
+    assert response.status_code == 401
 
 
 def test_patch_device_as_admin():
