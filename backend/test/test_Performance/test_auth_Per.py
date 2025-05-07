@@ -1,5 +1,3 @@
-from ..test_APIs.test_auth import test_auth
-import time
 
 """
 def test_auth_performance():
