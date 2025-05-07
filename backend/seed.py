@@ -19,10 +19,10 @@ def seed_database(engine) -> None:
         for i in range(10):
             for is_admin in [True, False]:
                 username = f"{'admin' if is_admin else 'user'}{i + 1}"
-                existing = session.exec(
+                existing_user = session.exec(
                     select(User).where(User.username == username)
                 ).first()
-                if not existing:
+                if not existing_user:
                     raw_password = "admin" if is_admin else "password"
                     user = User(
                         username=username,
@@ -35,12 +35,21 @@ def seed_database(engine) -> None:
         session.commit()
 
         devices = []
-        for i in range(1, 11):
-            device = session.get(Device, i)
-            if not device:
-                device = Device(id=i, hardware_id=str(randint(1000000, 9999999)))
+        for _ in range(1, 11):
+            existing_device = session.exec(
+                select(Device).where(
+                    Device.hardware_id == str(randint(1000000, 9999999))
+                )
+            ).first()
+
+            if not existing_device:
+                device = Device(hardware_id=str(randint(1000000, 9999999)))
                 session.add(device)
+            else:
+                device = existing_device
+
             devices.append(device)
+
         session.commit()
 
         for user in users:
@@ -67,7 +76,7 @@ def seed_database(engine) -> None:
                 loc = Location(
                     device_id=device.id,
                     latitude=uniform(-90.0, 90.0),
-                    longtitude=uniform(-180.0, 180.0),
+                    longitude=uniform(-180.0, 180.0),
                     altitude=uniform(0, 100),
                     speed=uniform(0, 120),
                     timestamp=datetime.utcnow(),
