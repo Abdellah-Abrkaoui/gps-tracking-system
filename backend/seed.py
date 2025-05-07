@@ -67,7 +67,7 @@ def seed_database(engine) -> None:
                 loc = Location(
                     device_id=device.id,
                     latitude=uniform(-90.0, 90.0),
-                    longtitude=uniform(-180.0, 180.0),
+                    longitude=uniform(-180.0, 180.0),
                     altitude=uniform(0, 100),
                     speed=uniform(0, 120),
                     timestamp=datetime.utcnow(),

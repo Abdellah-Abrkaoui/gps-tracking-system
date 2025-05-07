@@ -9,7 +9,7 @@ class User(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)
-    password: str
+    password: str = Field(repr=False)
     is_admin: Optional[bool] = False
 
     user_device_links: List["UserDeviceLink"] = Relationship(
@@ -56,7 +56,7 @@ class Location(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     device_id: int = Field(foreign_key="devices.id", nullable=False)
     latitude: float
-    longtitude: float
+    longitude: float
     altitude: float
     speed: float
     timestamp: Optional[datetime] = None
