@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
 from core.security import authenticate_user, create_access_token
 from db.database import Session, get_session
 from schemas.login import Login
 from schemas.token import Token
+from core.exceptions import UnauthorizedError
 
 router = APIRouter(tags=["Authentication"])
 
@@ -15,8 +16,7 @@ def login_for_access_token(
 ) -> Token:
     user = authenticate_user(login_data.username, login_data.password, session)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+        raise UnauthorizedError(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
