@@ -1,16 +1,14 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
 
 class DeviceBase(BaseModel):
     hardware_id: str
-    created_at: datetime
 
 
 class DeviceCreate(DeviceBase):
-    hardware_id: Optional[str]
+    pass
 
 
 class DeviceModify(DeviceBase):
@@ -19,3 +17,4 @@ class DeviceModify(DeviceBase):
 
 class DeviceRead(DeviceBase):
     id: int
+    created_at: datetime
