@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import DevicePopup from "./dashboard/DevicePopup.jsx";
+import DevicePopup from "./DevicePopup.jsx";
 import L from "leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
