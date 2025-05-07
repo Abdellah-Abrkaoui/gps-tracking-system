@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from core.dependencies import (
     admin_only,
@@ -22,6 +22,7 @@ from schemas.license_plate_history import (
     LicensePlateHistoryCreate,
     LicensePlateHistoryRead,
 )
+from core.exceptions import NotFoundError
 
 router = APIRouter(
     prefix="/license-plate-history",
@@ -38,10 +39,7 @@ def list_license_plate_history_by_device_id(
 ):
     license_plate_history = get_license_plate_history_by_device(session, device_id)
     if not license_plate_history:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="license plate history not found",
-        )
+        raise NotFoundError("license plate history not found")
 
     return license_plate_history
 
@@ -63,10 +61,7 @@ def read_license_plate_histories(
         )
 
     if not license_plate_history:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No license plate history found",
-        )
+        raise NotFoundError("No license plate history found")
 
     return license_plate_history
 
@@ -98,9 +93,6 @@ def remove_license_plate_history(
 ):
     history = get_license_plate_history_by_id(session, history_id)
     if not history:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="License plate history not found",
-        )
+        raise NotFoundError("License plate history not found")
 
     delete_license_plate_history(session, history)
