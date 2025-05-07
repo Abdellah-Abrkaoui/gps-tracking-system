@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 from db.models import Device, User, UserDeviceLink
 from schemas.user import UserCreate, UserModify, UserRead
-
+from core.exceptions import NotFoundError
 
 def get_user_by_id(session: Session, user_id: int) -> User | None:
     return session.get(User, user_id)
@@ -37,10 +37,7 @@ def create_user(session: Session, user_data: UserCreate) -> UserRead:
         missing_ids = set(device_ids) - found_ids
 
         if missing_ids:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Devices not found: {missing_ids}",
-            )
+            raise NotFoundError(f"Devices not found: {missing_ids}")
 
         session.add_all(
             [UserDeviceLink(user=user, device_id=device_id) for device_id in device_ids]
@@ -74,10 +71,7 @@ def update_user(session: Session, user: User, update_data: UserModify) -> UserRe
         missing_ids = set(device_ids) - found_ids
 
         if missing_ids:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Devices not found: {sorted(missing_ids)}",
-            )
+            raise NotFoundError(f"Devices not found: {sorted(missing_ids)}")
 
         existing_links = session.exec(
             select(UserDeviceLink).where(UserDeviceLink.user_id == user.id)

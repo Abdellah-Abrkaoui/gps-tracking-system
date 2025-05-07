@@ -16,6 +16,7 @@ from crud.user import (
 from db.database import Session, get_session
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.user import UserCreate, UserModify, UserRead
+from core.exceptions import NotFoundError
 
 router = APIRouter(
     prefix="/users",
@@ -35,9 +36,7 @@ def read_user(
 ):
     user = get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise NotFoundError("User not found")
 
     return user
 
@@ -77,9 +76,8 @@ def modify_user(
 ):
     user = get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise NotFoundError("User not found")
+
     return update_user(session, user, user_update)
 
 
@@ -97,8 +95,7 @@ def delete_user_by_id(
 ):
     user = get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise NotFoundError("User not found")
+
 
     return delete_user(session, user)

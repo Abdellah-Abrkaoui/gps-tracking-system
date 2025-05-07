@@ -17,6 +17,7 @@ from crud.location import (
 )
 from db.database import Session, get_session
 from schemas.location import LocationRead
+from core.exceptions import NotFoundError
 
 router = APIRouter(
     prefix="/locations",
@@ -36,10 +37,7 @@ def read_location(
 ):
     location = get_location_by_id(session, location_id)
     if not location:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Location not found"
-        )
-
+        raise NotFoundError("Location not found")
     return location
 
 
@@ -55,10 +53,8 @@ def read_locations(
         locations = get_locations_by_user_id(session, token["id"])
 
     if not locations:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No locations found",
-        )
+        raise NotFoundError("No locations found")
+
 
     return locations
 
@@ -76,8 +72,6 @@ def delete_location_by_id(
 ):
     location = get_location_by_id(session, location_id)
     if not location:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Location not found",
-        )
+        raise NotFoundError("Location not found")
+        
     return delete_location(session, location)

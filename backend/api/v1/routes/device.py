@@ -20,6 +20,8 @@ from crud.device import (
 )
 from db.database import Session, get_session
 from schemas.device import DeviceCreate, DeviceModify, DeviceRead
+from core.exceptions import NotFoundError
+
 
 router = APIRouter(
     prefix="/devices",
@@ -39,9 +41,7 @@ def read_device(
 ):
     device = get_device_by_id(session, device_id)
     if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Device not found"
-        )
+        raise NotFoundError("Device not found")
 
     return device
 
@@ -58,9 +58,7 @@ def read_devices(
         devices = get_devices_by_user_id(session, token["id"])
 
     if not devices:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No devices found"
-        )
+        raise NotFoundError("No devices found")
 
     return devices
 
@@ -77,10 +75,8 @@ def add_device(
 ):
     existing_device = get_device_by_hardware_id(session, device.hardware_id)
     if existing_device:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Device with such hardware id already exists",
-        )
+        raise NotFoundError("Device with such hardware id already exists")
+
     return create_device(session, device)
 
 
@@ -95,9 +91,7 @@ def modify_device(
 ):
     device = get_device_by_id(session, device_id)
     if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Device not found"
-        )
+        raise NotFoundError("Device not found")
 
     return update_device(session, device, device_update)
 
@@ -115,7 +109,6 @@ def delete_device_by_id(
 ):
     device = get_device_by_id(session, device_id)
     if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Device not found"
-        )
+        raise NotFoundError("Device not found")
+        
     return delete_device(session, device)
