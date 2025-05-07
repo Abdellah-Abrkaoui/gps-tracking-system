@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
 from core.dependencies import (
     admin_only,
@@ -55,7 +55,6 @@ def read_locations(
     if not locations:
         raise NotFoundError("No locations found")
 
-
     return locations
 
 
@@ -73,5 +72,5 @@ def delete_location_by_id(
     location = get_location_by_id(session, location_id)
     if not location:
         raise NotFoundError("Location not found")
-        
+
     return delete_location(session, location)

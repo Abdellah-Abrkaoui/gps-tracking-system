@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
 from core.security import authenticate_user, create_access_token
 from db.database import Session, get_session

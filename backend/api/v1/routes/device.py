@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from core.dependencies import (
     admin_only,
@@ -83,6 +83,7 @@ def add_device(
 @router.patch(
     "/{device_id}",
     response_model=DeviceRead,
+    dependencies=[Depends(admin_only)],
 )
 def modify_device(
     device_id: int,
@@ -110,5 +111,5 @@ def delete_device_by_id(
     device = get_device_by_id(session, device_id)
     if not device:
         raise NotFoundError("Device not found")
-        
+
     return delete_device(session, device)

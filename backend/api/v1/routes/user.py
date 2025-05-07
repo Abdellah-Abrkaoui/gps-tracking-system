@@ -97,5 +97,4 @@ def delete_user_by_id(
     if not user:
         raise NotFoundError("User not found")
 
-
     return delete_user(session, user)

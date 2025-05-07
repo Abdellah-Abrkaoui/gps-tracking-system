@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from core.dependencies import (
     admin_only,
@@ -22,6 +22,7 @@ from schemas.license_plate_history import (
     LicensePlateHistoryCreate,
     LicensePlateHistoryRead,
 )
+from core.exceptions import NotFoundError
 
 router = APIRouter(
     prefix="/license-plate-history",
@@ -61,7 +62,6 @@ def read_license_plate_histories(
 
     if not license_plate_history:
         raise NotFoundError("No license plate history found")
-
 
     return license_plate_history
 

@@ -1,10 +1,10 @@
 from sqlmodel import Session, select
 
-from fastapi import HTTPException, status
 
 from db.models import Device, User, UserDeviceLink
 from schemas.user import UserCreate, UserModify, UserRead
 from core.exceptions import NotFoundError
+
 
 def get_user_by_id(session: Session, user_id: int) -> User | None:
     return session.get(User, user_id)
