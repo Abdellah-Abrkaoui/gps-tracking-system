@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
-from random import randint, uniform, choice
+from random import choice, randint, uniform
+
 from sqlmodel import Session, select
+
 from core.security import get_password_hash
 from db.models import Device, LicensePlateHistory, Location, User, UserDeviceLink
 
@@ -35,19 +37,14 @@ def seed_database(engine) -> None:
         session.commit()
 
         devices = []
-        for _ in range(1, 11):
-            existing_device = session.exec(
-                select(Device).where(
-                    Device.hardware_id == str(randint(1000000, 9999999))
-                )
+        for i in range(1, 6):
+            hardware_id = f"device_{i}"
+            device = session.exec(
+                select(Device).where(Device.hardware_id == hardware_id)
             ).first()
-
-            if not existing_device:
-                device = Device(hardware_id=str(randint(1000000, 9999999)))
+            if not device:
+                device = Device(hardware_id=hardware_id)
                 session.add(device)
-            else:
-                device = existing_device
-
             devices.append(device)
 
         session.commit()

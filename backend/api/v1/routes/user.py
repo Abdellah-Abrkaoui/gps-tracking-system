@@ -1,10 +1,12 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+
 from core.dependencies import (
     admin_only,
     authentication_required,
-    verify_access,
-    verify_admin_modification_permissions,
     verify_admin_deletion_permissions,
+    verify_admin_modification_permissions,
 )
+from core.exceptions import NotFoundError
 from crud.user import (
     create_user,
     delete_user,
@@ -14,31 +16,13 @@ from crud.user import (
     update_user,
 )
 from db.database import Session, get_session
-from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.user import UserCreate, UserModify, UserRead
-from core.exceptions import NotFoundError
 
 router = APIRouter(
     prefix="/users",
     tags=["User Management"],
     dependencies=[Depends(authentication_required)],
 )
-
-
-@router.get(
-    "/{user_id}",
-    dependencies=[Depends(verify_access)],
-    response_model=UserRead,
-)
-def read_user(
-    user_id: int,
-    session: Session = Depends(get_session),
-):
-    user = get_user_by_id(session, user_id)
-    if not user:
-        raise NotFoundError("User not found")
-
-    return user
 
 
 @router.get("", response_model=list[UserRead], dependencies=[Depends(admin_only)])

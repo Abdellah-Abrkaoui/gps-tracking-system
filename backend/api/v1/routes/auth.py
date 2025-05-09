@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 
+from core.exceptions import UnauthorizedError
 from core.security import authenticate_user, create_access_token
 from db.database import Session, get_session
 from schemas.login import Login
 from schemas.token import Token
-from core.exceptions import UnauthorizedError
 
 router = APIRouter(tags=["Authentication"])
 

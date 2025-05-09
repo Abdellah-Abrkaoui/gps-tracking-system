@@ -7,8 +7,8 @@ from core.dependencies import (
     authentication_required,
     decode_jwt_token,
     oauth2_scheme,
-    verify_device_access,
 )
+from core.exceptions import NotFoundError
 from crud.device import (
     create_device,
     delete_device,
@@ -20,30 +20,12 @@ from crud.device import (
 )
 from db.database import Session, get_session
 from schemas.device import DeviceCreate, DeviceModify, DeviceRead
-from core.exceptions import NotFoundError
-
 
 router = APIRouter(
     prefix="/devices",
     tags=["Device Management"],
     dependencies=[Depends(authentication_required)],
 )
-
-
-@router.get(
-    "/{device_id}",
-    dependencies=[Depends(verify_device_access)],
-    response_model=DeviceRead,
-)
-def read_device(
-    device_id: int,
-    session: Session = Depends(get_session),
-):
-    device = get_device_by_id(session, device_id)
-    if not device:
-        raise NotFoundError("Device not found")
-
-    return device
 
 
 @router.get("", response_model=List[DeviceRead])
