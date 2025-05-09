@@ -1,5 +1,6 @@
 import requests
-from .test_auth import get_token_admin, get_token_user, get_token_SuperAdmin
+
+from .test_auth import get_token_admin, get_token_SuperAdmin, get_token_user
 
 TOKEN_SUPER_ADMIN = get_token_SuperAdmin()
 TOKEN_ADMIN = get_token_admin()
