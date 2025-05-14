@@ -48,3 +48,6 @@ uvicorn==0.34.1
 uvloop==0.21.0
 watchfiles==1.0.5
 websockets==15.0.1
+Pyro4==4.82
+serpent==1.41
+tomli==2.2.1
