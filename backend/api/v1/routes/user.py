@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi_pagination import paginate, LimitOffsetPage
 
 from core.dependencies import (
     admin_only,
@@ -25,9 +26,9 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=list[UserRead], dependencies=[Depends(admin_only)])
+@router.get("", response_model=LimitOffsetPage[UserRead], dependencies=[Depends(admin_only)])
 def read_users(session: Session = Depends(get_session)):
-    return get_users(session)
+    return paginate(get_users(session))
 
 
 @router.post(

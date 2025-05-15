@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from fastapi_pagination import paginate, LimitOffsetPage
 
 from core.dependencies import (
     authentication_required,
@@ -22,7 +23,7 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=List[LocationRead])
+@router.get("", response_model=LimitOffsetPage[LocationRead])
 def read_locations(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
 ):
@@ -36,4 +37,4 @@ def read_locations(
     if not locations:
         raise NotFoundError("No locations found")
 
-    return locations
+    return paginate(locations)
