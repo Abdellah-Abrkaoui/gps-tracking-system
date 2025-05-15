@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import CarMap from "../components/CarMap";
+import CarMap from "../components/dashboard/CarMap.jsx";
 import Sidebar from "../components/dashboard/SideBar";
 import VehicleCard from "../components/dashboard/VehicleCard";
 import { getAllDevices } from "../controllers/DevicesController.js";

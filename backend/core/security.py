@@ -3,8 +3,9 @@ from datetime import datetime, timedelta, timezone
 import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer
 
+from core.exceptions import ForbiddenError
 from crud.user import get_user_by_username
 from db.database import Session, get_session
 from schemas.user import UserBase
@@ -14,7 +15,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-security = HTTPBearer()
 
 
 def verify_password(password: str, hash: str) -> bool:
@@ -50,10 +50,7 @@ def decode_jwt_token(token_to_validate: str) -> dict | None:
             detail="Token has expired. Please log in again",
         )
     except jwt.InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token"
-        )
-
+        raise ForbiddenError()
     return None
 
 

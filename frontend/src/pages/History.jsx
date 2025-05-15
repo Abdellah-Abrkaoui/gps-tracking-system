@@ -50,7 +50,7 @@ const History = () => {
             .filter(loc => loc.device_id === device.id)
             .map(loc => ({
               latitude: loc.latitude,
-              longitude: loc.longtitude,
+              longitude: loc.longitude,
               timestamp: new Date(loc.timestamp).getTime(),
               speed: loc.speed ?? 0
             }));

@@ -4,16 +4,14 @@ services:
     container_name: fastapi-backend
     ports:
       - "8000:8000"
+      - "9090:9090"
     environment:
+      - APP_ENV=production
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/postgres
-    networks:
-      - backend-network
     depends_on:
       - db
-    volumes:
-      - ./backend:/app  
-      - /app/node_modules 
-    command: sh -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"  
+    networks:
+      - backend-network
 
   frontend:
     build:
@@ -23,16 +21,10 @@ services:
       - "3000:3000"
     environment:
       - REACT_APP_API_URL=http://backend:8000
-      - CHOKIDAR_USEPOLLING=true  
-    networks:
-      - backend-network
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    working_dir: /app
-    command: sh -c "npm install && npm run dev" 
+    networks:
+      - backend-network
 
   db:
     image: postgres:16

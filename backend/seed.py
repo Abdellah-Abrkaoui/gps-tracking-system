@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
-from random import randint, uniform, choice
+from random import choice, randint, uniform
+
 from sqlmodel import Session, select
+
 from core.security import get_password_hash
 from db.models import Device, LicensePlateHistory, Location, User, UserDeviceLink
 
@@ -19,10 +21,10 @@ def seed_database(engine) -> None:
         for i in range(10):
             for is_admin in [True, False]:
                 username = f"{'admin' if is_admin else 'user'}{i + 1}"
-                existing = session.exec(
+                existing_user = session.exec(
                     select(User).where(User.username == username)
                 ).first()
-                if not existing:
+                if not existing_user:
                     raw_password = "admin" if is_admin else "password"
                     user = User(
                         username=username,
@@ -35,12 +37,16 @@ def seed_database(engine) -> None:
         session.commit()
 
         devices = []
-        for i in range(1, 11):
-            device = session.get(Device, i)
+        for i in range(1, 6):
+            hardware_id = f"device_{i}"
+            device = session.exec(
+                select(Device).where(Device.hardware_id == hardware_id)
+            ).first()
             if not device:
-                device = Device(id=i, hardware_id=str(randint(1000000, 9999999)))
+                device = Device(hardware_id=hardware_id)
                 session.add(device)
             devices.append(device)
+
         session.commit()
 
         for user in users:
@@ -67,7 +73,7 @@ def seed_database(engine) -> None:
                 loc = Location(
                     device_id=device.id,
                     latitude=uniform(-90.0, 90.0),
-                    longtitude=uniform(-180.0, 180.0),
+                    longitude=uniform(-180.0, 180.0),
                     altitude=uniform(0, 100),
                     speed=uniform(0, 120),
                     timestamp=datetime.utcnow(),

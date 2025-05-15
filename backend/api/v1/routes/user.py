@@ -1,10 +1,13 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi_pagination import paginate, LimitOffsetPage
+
 from core.dependencies import (
     admin_only,
     authentication_required,
-    verify_access,
-    verify_admin_modification_permissions,
     verify_admin_deletion_permissions,
+    verify_admin_modification_permissions,
 )
+from core.exceptions import NotFoundError
 from crud.user import (
     create_user,
     delete_user,
@@ -14,7 +17,6 @@ from crud.user import (
     update_user,
 )
 from db.database import Session, get_session
-from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.user import UserCreate, UserModify, UserRead
 
 router = APIRouter(
@@ -24,27 +26,9 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "/{user_id}",
-    dependencies=[Depends(verify_access)],
-    response_model=UserRead,
-)
-def read_user(
-    user_id: int,
-    session: Session = Depends(get_session),
-):
-    user = get_user_by_id(session, user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-
-    return user
-
-
-@router.get("", response_model=list[UserRead], dependencies=[Depends(admin_only)])
+@router.get("", response_model=LimitOffsetPage[UserRead], dependencies=[Depends(admin_only)])
 def read_users(session: Session = Depends(get_session)):
-    return get_users(session)
+    return paginate(get_users(session))
 
 
 @router.post(
@@ -77,9 +61,8 @@ def modify_user(
 ):
     user = get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise NotFoundError("User not found")
+
     return update_user(session, user, user_update)
 
 
@@ -97,8 +80,6 @@ def delete_user_by_id(
 ):
     user = get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise NotFoundError("User not found")
 
     return delete_user(session, user)

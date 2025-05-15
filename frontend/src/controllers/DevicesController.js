@@ -67,7 +67,6 @@ const deviceController = {
 export default deviceController;
 
 export const getAllDevices = deviceController.getAllDevices;
-export const getSingleDevice = deviceController.getDeviceById;
 export const addDevice = deviceController.createDevice;
 export const editSingleDevice = deviceController.updateDevice;
 export const deleteDevice = deviceController.deleteDevice;

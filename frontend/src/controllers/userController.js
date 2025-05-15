@@ -51,7 +51,6 @@ const userController = {
 export default userController;
 
 export const getAllUsers = userController.getAllUsers;
-export const getSingleUser = userController.getUserById;
 export const addUser = userController.createUser;
 export const editSingleUser = userController.updateUser;
 export const deleteUser = userController.deleteUser;

@@ -1,17 +1,15 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
+from fastapi_pagination import paginate, LimitOffsetPage
 
 from core.dependencies import (
-    admin_only,
     authentication_required,
     decode_jwt_token,
     oauth2_scheme,
-    verify_location_access,
 )
+from core.exceptions import NotFoundError
 from crud.location import (
-    delete_location,
-    get_location_by_id,
     get_locations,
     get_locations_by_user_id,
 )
@@ -25,25 +23,7 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "/{location_id}",
-    dependencies=[Depends(verify_location_access)],
-    response_model=LocationRead,
-)
-def read_location(
-    location_id: int,
-    session: Session = Depends(get_session),
-):
-    location = get_location_by_id(session, location_id)
-    if not location:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Location not found"
-        )
-
-    return location
-
-
-@router.get("", response_model=List[LocationRead])
+@router.get("", response_model=LimitOffsetPage[LocationRead])
 def read_locations(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
 ):
@@ -55,29 +35,6 @@ def read_locations(
         locations = get_locations_by_user_id(session, token["id"])
 
     if not locations:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No locations found",
-        )
+        raise NotFoundError("No locations found")
 
-    return locations
-
-
-@router.delete(
-    "/{location_id}",
-    response_model=dict,
-    dependencies=[
-        Depends(admin_only),
-    ],
-)
-def delete_location_by_id(
-    location_id: int,
-    session: Session = Depends(get_session),
-):
-    location = get_location_by_id(session, location_id)
-    if not location:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Location not found",
-        )
-    return delete_location(session, location)
+    return paginate(locations)

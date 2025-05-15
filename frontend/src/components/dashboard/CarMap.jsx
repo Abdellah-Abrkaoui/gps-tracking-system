@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import DevicePopup from "./dashboard/DevicePopup.jsx";
+import DevicePopup from "./DevicePopup.jsx";
 import L from "leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -52,12 +52,12 @@ const MapCenter = ({ positions }) => {
   useEffect(() => {
     const validPositions = positions.filter(
       (loc) =>
-        typeof loc.latitude === "number" && typeof loc.longtitude === "number"
+        typeof loc.latitude === "number" && typeof loc.longitude === "number"
     );
 
     if (validPositions.length > 0) {
       const bounds = L.latLngBounds(
-        validPositions.map((loc) => [loc.latitude, loc.longtitude])
+        validPositions.map((loc) => [loc.latitude, loc.longitude])
       );
       map.fitBounds(bounds, { padding: [40, 40] });
     }
@@ -80,9 +80,9 @@ const Markers = ({ locations, devices, selectedDevice }) => {
       if (
         location &&
         typeof location.latitude === "number" &&
-        typeof location.longtitude === "number"
+        typeof location.longitude === "number"
       ) {
-        map.flyTo([location.latitude, location.longtitude], 15, {
+        map.flyTo([location.latitude, location.longitude], 15, {
           duration: 1,
           easeLinearity: 0.25,
         });
@@ -98,7 +98,7 @@ const Markers = ({ locations, devices, selectedDevice }) => {
     .filter(
       (location) =>
         typeof location.latitude === "number" &&
-        typeof location.longtitude === "number"
+        typeof location.longitude === "number"
     )
     .map((location) => {
       const device = devices.find((d) => d.id === location.device_id);
@@ -107,7 +107,7 @@ const Markers = ({ locations, devices, selectedDevice }) => {
       return (
         <Marker
           key={location.id}
-          position={[location.latitude, location.longtitude]}
+          position={[location.latitude, location.longitude]}
           icon={createCarIcon("active", selectedDevice?.id === device.id)}
           ref={(ref) => {
             if (ref) {
