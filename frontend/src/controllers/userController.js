@@ -11,19 +11,6 @@ const userController = {
     }
   },
 
-  getUserById: async (userId) => {
-    try {
-      const response = await axiosInstance.get(`/users/${userId}`);
-      return response.data;
-    } catch (error) {
-      console.error(
-        `Error fetching user with ID ${userId}:`,
-        error.response?.data?.detail
-      );
-      throw new Error(error.response?.data?.detail || "Failed to fetch user");
-    }
-  },
-
   createUser: async (userData) => {
     try {
       const response = await axiosInstance.post("/users", userData);

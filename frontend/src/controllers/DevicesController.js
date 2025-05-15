@@ -16,18 +16,7 @@ const deviceController = {
     }
   },
 
-  getDeviceById: async (deviceId) => {
-    try {
-      const response = await axiosInstance.get(`/devices/${deviceId}`);
-      return response.data;
-    } catch (error) {
-      console.error(
-        `Error fetching device with ID ${deviceId}:`,
-        error.response?.data?.detail
-      );
-      throw new Error(error.response?.data?.detail || "Failed to fetch device");
-    }
-  },
+  
 
   createDevice: async (deviceData) => {
     try {
