@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from fastapi_pagination import paginate, LimitOffsetPage
 
 from core.dependencies import (
     authentication_required,
@@ -26,7 +27,7 @@ router = APIRouter(
 
 @router.get(
     "",
-    response_model=List[LicensePlateHistoryRead],
+    response_model=LimitOffsetPage[LicensePlateHistoryRead],
 )
 def read_license_plate_histories(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
@@ -43,4 +44,4 @@ def read_license_plate_histories(
     if not license_plate_history:
         raise NotFoundError("No license plate history found")
 
-    return license_plate_history
+    return paginate(license_plate_history)
