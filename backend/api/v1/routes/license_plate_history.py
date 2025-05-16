@@ -1,7 +1,8 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
-from fastapi_pagination import paginate, LimitOffsetPage
+from fastapi_pagination import LimitOffsetPage
+from fastapi_pagination.ext.sqlmodel import paginate
 
 from core.dependencies import (
     authentication_required,
