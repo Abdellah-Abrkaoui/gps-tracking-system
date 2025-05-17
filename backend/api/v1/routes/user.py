@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi_pagination import paginate, LimitOffsetPage
+from fastapi_pagination import LimitOffsetPage
+from fastapi_pagination.ext.sqlmodel import paginate
 
 from core.dependencies import (
     admin_only,
