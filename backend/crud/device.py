@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from db.models import Device, UserDeviceLink
 from schemas.device import DeviceCreate, DeviceModify, DeviceRead
@@ -15,7 +15,7 @@ def get_device_by_hardware_id(session: Session, hardware_id: str) -> Device | No
 
 
 def get_devices(session: Session) -> list[Device]:
-    return session.query(Device).all()
+    return select(Device)
 
 
 def get_devices_by_user_id(session: Session, user_id: int) -> List[Device]:
