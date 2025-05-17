@@ -1,67 +1,77 @@
+import { useState, useEffect } from "react";
 import DevicesCard from "../components/devices/DevicesCard";
 import DeviceTable from "../components/devices/DevicesTable";
 import Pagination from "../components/devices/Pagination";
 import Modal from "../components/devices/Modal";
 import DeviceDetails from "../components/devices/DeviceDetails";
 import deviceController from "../controllers/DevicesController";
-import { useState, useEffect } from "react";
 
 function Devices() {
-  const [allDevices, setAllDevices] = useState([]); // Remplace dummyDevices par tableau vide
-  const [devices, setDevices] = useState([]); // Idem
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [currentDevice, setCurrentDevice] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    id: "",
-    hardwareId: "",
-    createdAt: "",
-  });
+  const [devices, setDevices] = useState([]);
+  const [totalDevices, setTotalDevices] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentDevices = devices.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(devices.length / itemsPerPage);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentDevice, setCurrentDevice] = useState(null);
+  const [formData, setFormData] = useState({ hardware_id: "" });
+
+  
   useEffect(() => {
     fetchDevices();
-  }, []);
+  }, [currentPage, searchTerm]);
 
   const fetchDevices = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const devicesData = await deviceController.getAllDevices();
-      setDevices(devicesData);
-      setAllDevices(devicesData);
+      const offset = (currentPage - 1) * itemsPerPage;
+      const data = await deviceController.getAllDevicespage(itemsPerPage, offset);
+      let filteredItems = data.items;
+
+      if (searchTerm.trim() !== "") {
+        const term = searchTerm.toLowerCase();
+        filteredItems = filteredItems.filter((device) => {
+          const id = device.id?.toString().toLowerCase() || "";
+          const hwid = device.hardware_id?.toLowerCase() || "";
+          return id.includes(term) || hwid.includes(term);
+        });
+      }
+
+      setDevices(filteredItems);
+      setTotalDevices(data.total);
     } catch (err) {
-      console.error("Erreur complète:", err); // Log error
+      console.error("Failed to load devices:", err);
       setError(err.message || "Failed to load devices");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      id: "",
-      hardwareId: "",
-      createdAt: "",
-    });
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const handleAddDevice = () => {
-    setCurrentDevice(null);
     setIsEditing(false);
-    resetForm();
+    setFormData({ hardware_id: "" });
+    setIsModalOpen(true);
+  };
+
+  const handleEditDevice = (device) => {
+    setIsEditing(true);
+    setCurrentDevice(device);
+    setFormData({ hardware_id: device.hardware_id, created_at: device.created_at });
     setIsModalOpen(true);
   };
 
@@ -70,15 +80,14 @@ function Devices() {
     setIsDetailsOpen(true);
   };
 
-  const handleEditDevice = (device) => {
-    setCurrentDevice(device);
-    setIsEditing(true);
-    setFormData({
-      id: device.id,
-      hardwareId: device.hardwareId,
-      createdAt: device.createdAt,
-    });
-    setIsModalOpen(true);
+  const handleDeleteDevice = async (id) => {
+    if (!confirm("Are you sure you want to delete this device?")) return;
+    try {
+      await deviceController.deleteDevice(id);
+      fetchDevices();
+    } catch (error) {
+      setError(error.message || "Failed to delete device");
+    }
   };
 
   const handleInputChange = (e) => {
@@ -88,87 +97,37 @@ function Devices() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
     try {
-      // Formatage des données pour l'API
-      const devicedata = {
-        hardware_id: formData.hardwareId,
-        // Si API attend une date specifique
-        created_at: formData.createdAt || new Date().toISOString(),
-      };
-
       if (isEditing) {
-        await deviceController.updateDevice(currentDevice.id, devicedata);
+        await deviceController.updateDevice(currentDevice.id, formData);
       } else {
-        await deviceController.createDevice(devicedata);
+        await deviceController.createDevice({
+          ...formData,
+          created_at: new Date().toISOString(),
+        });
       }
-    } catch (err) {
-      console.error("Operation failed:", err);
-      setError(
-        err.response?.data?.message || err.message || "Operation failed"
-      );
-    } finally {
-      setIsLoading(false);
       setIsModalOpen(false);
-      resetForm();
-      await fetchDevices();
-    }
-  };
-
-  const handleDeleteDevice = async (deviceId) => {
-    if (!window.confirm("Are you sure you want to delete this device?")) return;
-    try {
-      await deviceController.deleteDevice(deviceId);
-      setAllDevices(allDevices.filter((device) => device.id !== deviceId));
-      setDevices(devices.filter((device) => device.id !== deviceId));
-      if (currentDevices.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1);
-      }
+      fetchDevices();
     } catch (error) {
-      // Gestion des erreurs
-      setError(error.message || "Failed to delete device");
-      console.error("Error deleting device:", error);
+      console.error(error);
+      setError(error.message || "Failed to save device");
     }
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleSearch = (term) => {
-    const searchTerm = term.trim().toLowerCase();
-    setSearchTerm(searchTerm);
-  
-    if (searchTerm === "") {
-      setDevices(allDevices);
-      setCurrentPage(1);
-      return;
-    }
-  
-    const filteredDevices = allDevices.filter((device) => {
-      const deviceId = device.id?.toString().toLowerCase() || "";
-      const hardware_id = device.hardware_id?.toString().toLowerCase() || "";
-      return deviceId.includes(searchTerm) || hardware_id.includes(searchTerm);
-    });
-  
-    setDevices(filteredDevices);
-    setCurrentPage(1);
-  };
+  const totalPages = Math.ceil(totalDevices / itemsPerPage);
 
   return (
     <div className="mx-4 my-5 sm:mx-7">
       <DevicesCard
         onAddDevice={handleAddDevice}
-        totalDevices={allDevices.length}
+        totalDevices={totalDevices}
         deviceCount={devices.length}
         onSearch={handleSearch}
         searchTerm={searchTerm}
       />
 
       <DeviceTable
-        devices={currentDevices}
+        devices={devices}
         onView={handleViewDevice}
         onEdit={handleEditDevice}
         onDelete={handleDeleteDevice}
@@ -179,14 +138,14 @@ function Devices() {
         totalPages={totalPages}
         onPageChange={handlePageChange}
         itemsPerPage={itemsPerPage}
-        totalItems={devices.length}
+        totalItems={totalDevices}
       />
 
-      {/* Add/Edit Modal */}
+      {/* Modal for Add/Edit */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">
-            {isEditing ? "Edit Device" : "Add New Device"}
+            {isEditing ? "Edit Device" : "Add Device"}
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -195,23 +154,13 @@ function Devices() {
               </label>
               <input
                 type="text"
-                name="hardwareId"
-                value={formData.hardwareId || ""}
+                name="hardware_id"
+                value={formData.hardware_id}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-md"
                 required
+                className="w-full px-3 py-2 border rounded-md"
               />
             </div>
-            {isEditing && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Creation Date
-                </label>
-                <p className="text-sm text-gray-500">
-                  {new Date(formData.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            )}
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 type="button"
@@ -231,7 +180,6 @@ function Devices() {
         </div>
       </Modal>
 
-      {/* Device Details Modal */}
       {currentDevice && (
         <DeviceDetails
           device={currentDevice}

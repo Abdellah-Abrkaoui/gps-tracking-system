@@ -8,16 +8,13 @@ const UserTable = ({
   onSort,
   getSortIcon,
   isLoading,
-  currentPage,
+  offset,
   usersPerPage,
-  totalPages,
-  onPageChange,
+  totalCount,
+  onNextPage,
+  onPrevPage,
 }) => {
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-
-  // Function to check if user is the protected admin (id === 1)
+  // Check if the user is the protected admin (id === 1)
   const isProtectedAdmin = (userId) => userId === 1;
 
   return (
@@ -75,7 +72,7 @@ const UserTable = ({
                     </div>
                   </td>
                 </tr>
-              ) : currentUsers.length === 0 ? (
+              ) : users.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
@@ -85,7 +82,7 @@ const UserTable = ({
                   </td>
                 </tr>
               ) : (
-                currentUsers.map((user) => (
+                users.map((user) => (
                   <tr
                     key={user.id}
                     className="hover:bg-gray-50 transition-colors duration-150"
@@ -156,13 +153,13 @@ const UserTable = ({
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
-          ) : currentUsers.length === 0 ? (
+          ) : users.length === 0 ? (
             <div className="px-4 py-12 text-center text-gray-500">
               No users found
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {currentUsers.map((user) => (
+              {users.map((user) => (
                 <div
                   key={user.id}
                   className="p-4 hover:bg-gray-50 transition-colors duration-150"
@@ -226,20 +223,20 @@ const UserTable = ({
       {users.length > 0 && (
         <div className="flex justify-between items-center mt-4 px-2">
           <div className="text-sm text-gray-500">
-            Showing {indexOfFirstUser + 1} to{" "}
-            {Math.min(indexOfLastUser, users.length)} of {users.length} items
+            Showing {offset + 1} to{" "}
+            {Math.min(offset + users.length, totalCount)} of {totalCount} items
           </div>
           <div className="flex space-x-2">
             <button
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={onPrevPage}
+              disabled={offset === 0}
               className="px-3 py-1 border rounded-md text-sm disabled:opacity-50"
             >
               Previous
             </button>
             <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              onClick={onNextPage}
+              disabled={offset + usersPerPage >= totalCount}
               className="px-3 py-1 border rounded-md text-sm disabled:opacity-50"
             >
               Next

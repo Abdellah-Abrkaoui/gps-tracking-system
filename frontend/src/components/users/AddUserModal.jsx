@@ -13,19 +13,19 @@ const AddUserModal = ({
   const [error, setError] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
-  // use state for storing devices
-
+  // Devices state
   const [devices, setDevices] = useState([]);
   const [devicesLoading, setDevicesLoading] = useState(true);
 
-  // use effect to fetch devices from DevicesController
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const data = await deviceController.getAllDevices();
-        setDevices(data);
+        // Si getAllDevices supporte pagination, on peut gérer limit/offset ici, sinon appel simple
+        const data = await deviceController.getAllDevices(100, 0); // exemple limit=100 offset=0
+        // Supposons data = { items: [...], total, limit, offset }
+        setDevices(data.items || []);
       } catch (error) {
-        console.log("Failed to feetch Devices", error);
+        console.error("Failed to fetch devices", error);
       } finally {
         setDevicesLoading(false);
       }
@@ -37,22 +37,18 @@ const AddUserModal = ({
     e.preventDefault();
     setError(null);
 
-    // Validate inputs
     if (!newUser.username.trim()) {
       setError("Username is required");
       return;
     }
-
     if (!newUser.password) {
       setError("Password is required");
       return;
     }
-
     if (newUser.password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
-
     if (newUser.password !== passwordConfirmation) {
       setError("Passwords do not match");
       return;
@@ -62,7 +58,8 @@ const AddUserModal = ({
     try {
       await onSubmit();
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError("Failed to create user");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,6 +82,7 @@ const AddUserModal = ({
             <button
               onClick={() => setError(null)}
               className="float-right font-bold"
+              aria-label="Close error message"
             >
               ×
             </button>
@@ -93,7 +91,7 @@ const AddUserModal = ({
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {/* Username Field */}
+            {/* Username */}
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
                 Username *
@@ -109,7 +107,7 @@ const AddUserModal = ({
               />
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
                 Password *
@@ -149,6 +147,8 @@ const AddUserModal = ({
               <div className="max-h-40 overflow-y-auto rounded-md border border-gray-300 p-3 space-y-2">
                 {devicesLoading ? (
                   <p className="text-sm text-gray-500">Loading devices...</p>
+                ) : devices.length === 0 ? (
+                  <p className="text-sm text-gray-500">No devices available</p>
                 ) : (
                   devices
                     .slice()
