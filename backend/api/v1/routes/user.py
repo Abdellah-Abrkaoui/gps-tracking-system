@@ -29,7 +29,7 @@ router = APIRouter(
 
 @router.get("", response_model=LimitOffsetPage[UserRead], dependencies=[Depends(admin_only)])
 def read_users(session: Session = Depends(get_session)):
-    return paginate(get_users(session))
+    return paginate(session, get_users())
 
 
 @router.post(

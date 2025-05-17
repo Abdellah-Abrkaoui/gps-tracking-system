@@ -35,7 +35,7 @@ def read_locations(
     else:
         locations = get_locations_by_user_id(session, token["id"])
 
-    if not locations:
+    if locations is None:
         raise NotFoundError("No locations found")
 
-    return paginate(locations)
+    return paginate(session, locations)

@@ -41,10 +41,10 @@ def read_devices(
     else:
         devices = get_devices_by_user_id(session, token["id"])
 
-    if not devices:
+    if devices is None:
         raise NotFoundError("No devices found")
 
-    return paginate(devices)
+    return paginate(session, devices)
 
 
 @router.post(

@@ -26,4 +26,4 @@ def get_license_plate_history_by_user_id(
 
 
 def get_license_plate_history(session: Session) -> list[LicensePlateHistoryRead]:
-    return session.query(LicensePlateHistory).all()
+    return select(LicensePlateHistory)

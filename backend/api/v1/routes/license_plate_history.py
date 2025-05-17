@@ -42,7 +42,7 @@ def read_license_plate_histories(
             session, token["id"]
         )
 
-    if not license_plate_history:
+    if license_plate_history is None:
         raise NotFoundError("No license plate history found")
 
-    return paginate(license_plate_history)
+    return paginate(session, license_plate_history)
