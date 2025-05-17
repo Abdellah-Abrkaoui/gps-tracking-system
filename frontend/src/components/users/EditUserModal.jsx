@@ -13,37 +13,51 @@ const EditUserModal = ({
   const [error, setError] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
-  // use state for storing devices
-
+  // Device states and pagination
   const [devices, setDevices] = useState([]);
   const [devicesLoading, setDevicesLoading] = useState(true);
+  const [limit] = useState(50); // Number of devices per page
+  const [offset, setOffset] = useState(0);
+  const [totalDevices, setTotalDevices] = useState(null);
 
-  // use effect to fetch devices from DevicesController
   useEffect(() => {
-    const fetchDevices = async () => {
+    const fetchAllDevices = async () => {
+      setDevicesLoading(true);
+      let allDevices = [];
+      let currentOffset = 0;
+
       try {
-        const data = await deviceController.getAllDevices();
-        setDevices(data);
+        while (true) {
+          const data = await deviceController.getAllDevices(limit, currentOffset);
+          allDevices = [...allDevices, ...data.items];
+          setTotalDevices(data.total);
+
+          if (allDevices.length >= data.total) {
+            break; // all devices loaded
+          }
+
+          currentOffset += limit;
+        }
+        setDevices(allDevices);
       } catch (error) {
-        console.log("Failed to feetch Devices", error);
+        console.error("Failed to fetch devices:", error);
       } finally {
         setDevicesLoading(false);
       }
     };
-    fetchDevices();
-  }, []);
+
+    fetchAllDevices();
+  }, [limit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    // Validate inputs
     if (!editUser.username.trim()) {
       setError("Username is required");
       return;
     }
 
-    // Only validate password if it's being changed
     if (editUser.password && editUser.password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
@@ -58,7 +72,7 @@ const EditUserModal = ({
     try {
       await onSubmit();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }

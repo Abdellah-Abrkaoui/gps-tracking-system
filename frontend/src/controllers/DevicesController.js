@@ -16,9 +16,7 @@ const deviceController = {
     }
   },
 
-  
-
-  createDevice: async (deviceData) => {
+    createDevice: async (deviceData) => {
     try {
       const response = await axiosInstance.post("/devices", deviceData);
       return response.data;
@@ -62,6 +60,20 @@ const deviceController = {
       );
     }
   },
+  getAllDevicespage: async (limit , offset ) => {
+    try {
+      const response = await axiosInstance.get(`/devices?limit=${limit}&offset=${offset}`);
+      return response.data; // expected: { items, total, limit, offset }
+    } catch (error) {
+      console.error("Error fetching devices:", error.response?.data?.detail);
+      throw new Error(
+        error.response?.data?.detail || "Failed to fetch devices"
+      );
+    }
+  },
+  
+  
+  
 };
 
 export default deviceController;
@@ -70,3 +82,4 @@ export const getAllDevices = deviceController.getAllDevices;
 export const addDevice = deviceController.createDevice;
 export const editSingleDevice = deviceController.updateDevice;
 export const deleteDevice = deviceController.deleteDevice;
+export const getAllDevicespage = deviceController.getAllDevicespage;

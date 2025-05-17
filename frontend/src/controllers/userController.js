@@ -1,15 +1,18 @@
 import axiosInstance from "../controllers/axiosController";
 
 const userController = {
-  getAllUsers: async () => {
+  getAllUsers: async (limit, offset) => {
     try {
-      const response = await axiosInstance.get("/users");
-      return response.data;
+      const response = await axiosInstance.get(
+        `/users?limit=${limit}&offset=${offset}`
+      );
+      return response.data; // { items, total, limit, offset }
     } catch (error) {
-      console.error("Error fetching all users:", error.response?.data?.detail);
+      console.error("Error fetching users:", error.response?.data?.detail);
       throw new Error(error.response?.data?.detail || "Failed to fetch users");
     }
   },
+  
 
   createUser: async (userData) => {
     try {
