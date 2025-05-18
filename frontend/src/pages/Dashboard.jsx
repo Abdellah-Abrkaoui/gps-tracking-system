@@ -48,7 +48,7 @@ const Dashboard = () => {
       hasMore = currentPage.length === limit;
       offset += limit;
       pageCount++;
-      console.log(`Page ${pageCount + 1}: fetched ${currentPage.length} items`);
+      // console.log(`Page ${pageCount + 1}: fetched ${currentPage.length} items`);
     }
 
     return allLocations;
