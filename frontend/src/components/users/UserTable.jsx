@@ -105,7 +105,11 @@ const UserTable = ({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.devices.length > 0 ? (
+                      {user.id === 1 && user.is_admin ? (
+                        <span className="text-gray-600 font-medium">
+                          All devices
+                        </span>
+                      ) : user.devices.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {user.devices.map((deviceId) => (
                             <span
