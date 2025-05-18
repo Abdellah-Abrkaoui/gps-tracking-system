@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
 from fastapi_pagination import LimitOffsetPage
 from fastapi_pagination.ext.sqlmodel import paginate
@@ -31,9 +29,9 @@ def read_locations(
     token = decode_jwt_token(token)
 
     if token.get("is_admin"):
-        locations = get_locations(session)
+        locations = get_locations()
     else:
-        locations = get_locations_by_user_id(session, token["id"])
+        locations = get_locations_by_user_id(token["id"])
 
     if locations is None:
         raise NotFoundError("No locations found")

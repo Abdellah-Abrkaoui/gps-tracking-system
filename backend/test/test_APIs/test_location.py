@@ -7,7 +7,8 @@ TOKEN_USER = get_token_user()
 
 LOCATION_ID_CREATED = None
 
-#test list locations
+
+# test list locations
 def test_list_locations_admin():
     response = requests.get(
         "http://backend:8000/api/v1/locations",
@@ -22,6 +23,7 @@ def test_list_locations_admin():
     global LOCATION_ID_CREATED
     if response.json():
         LOCATION_ID_CREATED = response.json()[0]["id"]
+
 
 # test get location by id
 def test_get_location_by_id_superadmin():
@@ -55,10 +57,9 @@ def test_get_location_by_id_unauthorized_user():
     )
     assert response.status_code in [401, 403]
 
+
 # test delete
 def test_delete_location_as_admin():
-   
-
     response = requests.delete(
         f"http://backend:8000/api/v1/locations/{LOCATION_ID_CREATED}",
         headers={
@@ -66,14 +67,12 @@ def test_delete_location_as_admin():
             "Authorization": f"Bearer {TOKEN_ADMIN}",
         },
     )
-    assert response.status_code == 200  
-
+    assert response.status_code == 200
 
 
 def test_delete_location_as_user_forbidden():
-    
     response = requests.delete(
-        f"http://backend:8000/api/v1/locations/{LOCATION_ID_CREATED+1}",
+        f"http://backend:8000/api/v1/locations/{LOCATION_ID_CREATED + 1}",
         headers={
             "accept": "application/json",
             "Authorization": f"Bearer {TOKEN_USER}",
@@ -83,8 +82,6 @@ def test_delete_location_as_user_forbidden():
 
 
 def test_delete_locationNotExist_as_admin():
-    
-
     response = requests.delete(
         f"http://backend:8000/api/v1/locations/{LOCATION_ID_CREATED}",
         headers={
@@ -92,5 +89,4 @@ def test_delete_locationNotExist_as_admin():
             "Authorization": f"Bearer {TOKEN_ADMIN}",
         },
     )
-    assert response.status_code == 404 
-
+    assert response.status_code == 404

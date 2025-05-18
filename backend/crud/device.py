@@ -1,5 +1,3 @@
-from typing import List
-
 from sqlmodel import Session, select
 
 from db.models import Device, UserDeviceLink
@@ -14,16 +12,15 @@ def get_device_by_hardware_id(session: Session, hardware_id: str) -> Device | No
     return session.query(Device).filter(Device.hardware_id == hardware_id).first()
 
 
-def get_devices(session: Session) -> list[Device]:
+def get_devices() -> select:
     return select(Device)
 
 
-def get_devices_by_user_id(session: Session, user_id: int) -> List[Device]:
+def get_devices_by_user_id(user_id: int) -> select:
     return (
-        session.query(Device)
+        select(Device)
         .join(UserDeviceLink, UserDeviceLink.device_id == Device.id)
-        .filter(UserDeviceLink.user_id == user_id)
-        .all()
+        .where(UserDeviceLink.user_id == user_id)
     )
 
 
