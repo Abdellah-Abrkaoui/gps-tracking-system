@@ -35,7 +35,7 @@ def read_devices(
     token = decode_jwt_token(token)
 
     if token.get("is_admin"):
-        devices = get_devices(session)
+        devices = get_devices()
     else:
         devices = get_devices_by_user_id(token["id"])
 
