@@ -2,6 +2,7 @@ import Pyro4
 import time
 from random import uniform
 
+
 def simulate_gps(device_id: int, interval=2):
     gps = Pyro4.Proxy("PYRO:gps.service@localhost:9090")
     while True:
@@ -18,6 +19,6 @@ def simulate_gps(device_id: int, interval=2):
 
         time.sleep(interval)
 
+
 if __name__ == "__main__":
     simulate_gps(device_id=1)
-

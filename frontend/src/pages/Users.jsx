@@ -32,23 +32,40 @@ const Users = () => {
     devices: [],
   });
 
-  const usersPerPage = 5;
-
+  const [offset, setOffset] = useState(0);
+  const usersPerPage = 6;
+  const [totalCount, setTotalCount] = useState(0);
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(offset);
+  }, [offset]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (offsetValue = 0) => {
     setIsLoading(true);
     setError(null);
     try {
-      const fetchedUsers = await userController.getAllUsers();
-      setUsers(fetchedUsers);
+      const { items, total } = await userController.getAllUsers(
+        usersPerPage,
+        offsetValue
+      );
+      setUsers(items);
+      setTotalCount(total);
     } catch (error) {
       setError(error.message || "Failed to fetch users");
       console.error("Error fetching users:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (offset + usersPerPage < totalCount) {
+      setOffset(offset + usersPerPage);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (offset - usersPerPage >= 0) {
+      setOffset(offset - usersPerPage);
     }
   };
 
@@ -71,7 +88,7 @@ const Users = () => {
 
       setShowAddModal(false);
       setNewUser({ username: "", password: "", is_admin: false, devices: [] });
-      await fetchUsers();
+      await fetchUsers(offset);
     } catch (error) {
       setError(error.message || "Failed to add user");
       console.error("Error adding user:", error);
@@ -87,7 +104,7 @@ const Users = () => {
 
       await userController.updateUser(editUser.id, userToUpdate);
       setShowEditModal(false);
-      await fetchUsers();
+      await fetchUsers(offset);
     } catch (error) {
       setError(error.message || "Failed to update user");
       console.error("Error updating user:", error);
@@ -184,16 +201,17 @@ const Users = () => {
       )}
 
       <UserTable
-        users={sortedUsers}
+        users={users} // now from backend directly
         onEdit={handleEditClick}
         onDelete={handleDelete}
         onSort={onSort}
         getSortIcon={getSortIcon}
         isLoading={isLoading}
-        currentPage={currentPage}
+        offset={offset}
         usersPerPage={usersPerPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
+        totalCount={totalCount}
+        onNextPage={handleNextPage}
+        onPrevPage={handlePrevPage}
       />
 
       {/* Modals */}

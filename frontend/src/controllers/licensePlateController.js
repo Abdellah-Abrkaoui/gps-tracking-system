@@ -1,9 +1,11 @@
 import axiosInstance from "../controllers/axiosController";
 
 const licensePlateController = {
-  getAlllicenseplate: async () => {
+  getAlllicenseplate: async (limit, offset) => {
     try {
-      const response = await axiosInstance.get("/license-plate-history");
+      const response = await axiosInstance.get(
+        `/license-plate-history?limit=${limit}&offset=${offset}`
+      );
       return response.data;
     } catch (error) {
       console.error(

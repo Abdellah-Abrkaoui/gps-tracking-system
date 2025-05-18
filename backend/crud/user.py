@@ -13,8 +13,8 @@ def get_user_by_username(session: Session, username: str) -> User | None:
     return session.query(User).filter(User.username == username).first()
 
 
-def get_users(session: Session) -> list[User]:
-    return session.query(User).all()
+def get_users() -> list[User]:
+    return select(User)
 
 
 def create_user(session: Session, user_data: UserCreate) -> UserRead:

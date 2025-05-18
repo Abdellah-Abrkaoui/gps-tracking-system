@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 from sqlmodel import SQLModel
 
 from api.v1.routers import routers
@@ -29,3 +30,4 @@ app.openapi = lambda: custom_openapi(app)
 
 
 app.include_router(routers)
+add_pagination(app)
