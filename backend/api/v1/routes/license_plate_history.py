@@ -34,11 +34,9 @@ def read_license_plate_histories(
     token = decode_jwt_token(token)
 
     if token.get("is_admin"):
-        license_plate_history = get_license_plate_history(session)
+        license_plate_history = get_license_plate_history()
     else:
-        license_plate_history = get_license_plate_history_by_user_id(
-            session, token["id"]
-        )
+        license_plate_history = get_license_plate_history_by_user_id(token["id"])
 
     if license_plate_history is None:
         raise NotFoundError("No license plate history found")
