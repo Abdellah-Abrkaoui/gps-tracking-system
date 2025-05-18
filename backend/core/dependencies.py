@@ -5,9 +5,6 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from core.exceptions import ForbiddenError, NotFoundError, UnauthorizedError
 from core.security import decode_jwt_token, oauth2_scheme
-from crud.device import get_devices_by_user_id
-from crud.license_plate_history import get_license_plate_history_by_id
-from crud.location import get_locations_by_user_id
 from crud.user import get_user_by_id
 from db.database import Session, get_session
 from schemas.user import UserBase

@@ -6,7 +6,7 @@ TOKEN_ADMIN = get_token_admin()
 TOKEN_USER = get_token_user()
 
 LICENSE_PLATE_HISTORY_ID = None
-DEVICE_ID_FOR_LICENSE_PLATE = "2603700"  
+DEVICE_ID_FOR_LICENSE_PLATE = "2603700"
 
 
 def test_get_license_plate_history_list():

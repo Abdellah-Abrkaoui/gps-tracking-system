@@ -7,7 +7,8 @@ TOKEN_USER = get_token_user()
 
 LOCATION_ID_CREATED = None
 
-#test list locations
+
+# test list locations
 def test_list_locations_admin():
     response = requests.get(
         "http://backend:8000/api/v1/locations",
@@ -22,5 +23,3 @@ def test_list_locations_admin():
     global LOCATION_ID_CREATED
     if response.json():
         LOCATION_ID_CREATED = response.json()[0]["id"]
-
-

@@ -1,6 +1,6 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
+from fastapi_pagination import LimitOffsetPage
+from fastapi_pagination.ext.sqlmodel import paginate
 
 from core.dependencies import (
     authentication_required,
@@ -22,18 +22,18 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=List[LocationRead])
+@router.get("", response_model=LimitOffsetPage[LocationRead])
 def read_locations(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
 ):
     token = decode_jwt_token(token)
 
     if token.get("is_admin"):
-        locations = get_locations(session)
+        locations = get_locations()
     else:
-        locations = get_locations_by_user_id(session, token["id"])
+        locations = get_locations_by_user_id(token["id"])
 
-    if not locations:
+    if locations is None:
         raise NotFoundError("No locations found")
 
-    return locations
+    return paginate(session, locations)

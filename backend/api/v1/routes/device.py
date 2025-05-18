@@ -1,6 +1,6 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, status
+from fastapi_pagination import LimitOffsetPage
+from fastapi_pagination.ext.sqlmodel import paginate
 
 from core.dependencies import (
     admin_only,
@@ -28,21 +28,21 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=List[DeviceRead])
+@router.get("", response_model=LimitOffsetPage[DeviceRead])
 def read_devices(
     token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
 ):
     token = decode_jwt_token(token)
 
     if token.get("is_admin"):
-        devices = get_devices(session)
+        devices = get_devices()
     else:
-        devices = get_devices_by_user_id(session, token["id"])
+        devices = get_devices_by_user_id(token["id"])
 
-    if not devices:
+    if devices is None:
         raise NotFoundError("No devices found")
 
-    return devices
+    return paginate(session, devices)
 
 
 @router.post(
