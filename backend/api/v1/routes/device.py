@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, status
 from fastapi_pagination import LimitOffsetPage
 from fastapi_pagination.ext.sqlmodel import paginate
@@ -39,7 +37,7 @@ def read_devices(
     if token.get("is_admin"):
         devices = get_devices(session)
     else:
-        devices = get_devices_by_user_id(session, token["id"])
+        devices = get_devices_by_user_id(token["id"])
 
     if devices is None:
         raise NotFoundError("No devices found")
