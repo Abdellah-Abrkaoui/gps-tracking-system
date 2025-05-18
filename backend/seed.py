@@ -37,7 +37,7 @@ def seed_database(engine) -> None:
         session.commit()
 
         devices = []
-        for i in range(1, 6):
+        for i in range(1, 1000):
             hardware_id = f"device_{i}"
             device = session.exec(
                 select(Device).where(Device.hardware_id == hardware_id)

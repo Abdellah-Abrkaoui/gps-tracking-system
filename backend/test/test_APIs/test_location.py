@@ -18,8 +18,14 @@ def test_list_locations_admin():
         },
     )
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+
+    data = response.json()
+
+    # Top-level structure check
+    assert isinstance(data, dict)
+    assert "items" in data
+    assert isinstance(data["items"], list)
 
     global LOCATION_ID_CREATED
-    if response.json():
-        LOCATION_ID_CREATED = response.json()[0]["id"]
+    if data["items"]:
+        LOCATION_ID_CREATED = data["items"][0]["id"]

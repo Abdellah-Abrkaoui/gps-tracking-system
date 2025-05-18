@@ -18,6 +18,14 @@ def test_get_license_plate_history_list():
         },
     )
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-
+    
+    data = response.json()
+    
+    # Ensure the structure matches the documented response
+    assert isinstance(data, dict)
+    assert "items" in data
+    assert "total" in data
+    assert "limit" in data
+    assert "offset" in data
+    assert isinstance(data["items"], list)
 
