@@ -77,7 +77,19 @@ def test_list_devices_admin():
         headers={"Authorization": f"Bearer {TOKEN_ADMIN}"},
     )
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    
+    data = response.json()
+    
+    # Check that the top-level response is a dict with expected keys
+    assert isinstance(data, dict)
+    assert "items" in data
+    assert "total" in data
+    assert "limit" in data
+    assert "offset" in data
+    
+    # Check that "items" is a list
+    assert isinstance(data["items"], list)
+
 
 
 def test_list_devices_user():
