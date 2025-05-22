@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import DevicePopup from "./DevicePopup.jsx";
@@ -69,6 +69,16 @@ const MapCenter = ({ positions }) => {
 const Markers = ({ locations, devices, selectedDevice }) => {
   const markerRefs = useRef({});
   const map = useMap();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Auto-refresh markers every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey(prev => prev + 1);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (selectedDevice && markerRefs.current[selectedDevice.id]) {
@@ -92,7 +102,7 @@ const Markers = ({ locations, devices, selectedDevice }) => {
         }, 300);
       }
     }
-  }, [selectedDevice]);
+  }, [selectedDevice, refreshKey]); // Added refreshKey as dependency
 
   return locations
     .filter(
@@ -106,7 +116,7 @@ const Markers = ({ locations, devices, selectedDevice }) => {
 
       return (
         <Marker
-          key={location.id}
+          key={`${location.id}-${refreshKey}`} // Add refreshKey to force re-render
           position={[location.latitude, location.longitude]}
           icon={createCarIcon("active", selectedDevice?.id === device.id)}
           ref={(ref) => {

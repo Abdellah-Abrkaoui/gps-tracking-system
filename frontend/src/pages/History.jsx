@@ -9,6 +9,7 @@ const History = () => {
   const userId = localStorage.getItem("userId");
   const [vehicles, setVehicles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Fetch all pages of data from a controller
   const fetchAllData = async (controllerFunc) => {
@@ -94,7 +95,7 @@ const History = () => {
             speedData,
           };
         })
-        .filter(Boolean); // remove nulls
+        .filter(Boolean);
 
       setVehicles(assembledVehicles);
     } catch (err) {
@@ -105,8 +106,22 @@ const History = () => {
   };
 
   useEffect(() => {
-    fetchData(); // called once
-  }, []); // only run on mount
+    fetchData();
+    
+    // Set up interval to trigger refresh
+    const interval = setInterval(() => {
+      setRefreshTrigger(prev => prev + 1);
+    }, 20000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // This effect will run when refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger > 0) { // Skip initial render
+      fetchData();
+    }
+  }, [refreshTrigger]);
 
   return (
     <div className="container mx-auto p-4">

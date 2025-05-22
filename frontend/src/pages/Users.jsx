@@ -201,7 +201,7 @@ const Users = () => {
       )}
 
       <UserTable
-        users={users} // now from backend directly
+       users={sortedUsers} 
         onEdit={handleEditClick}
         onDelete={handleDelete}
         onSort={onSort}
