@@ -10,14 +10,22 @@ from db.database import engine
 from seed import seed_database
 
 app = FastAPI()
-origins = ["*"]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def on_startup():
     SQLModel.metadata.create_all(engine)
     seed_database(engine)
 
-# Connect to the running Pyro4 daemon
+
 gps_service = Pyro4.Proxy("PYRO:gps.service@localhost:9090")
 
 @app.post("/rpc")
